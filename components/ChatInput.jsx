@@ -16,7 +16,7 @@ export default function ChatInput({ onSend }) {
             handleSend();
         }
     };
-    return (<div className="flex-shrink-0 border-t border-[#e8edf6] bg-white px-4 py-4 md:px-6">
+    return (<div className="flex-shrink-0 bg-transparent px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3">
       <div className="flex items-center gap-3 rounded-[18px] border border-[#e2e8f3] bg-white px-4 py-3 shadow-[0_10px_30px_rgba(31,42,68,0.06)] transition-all focus-within:border-[#c9d8ff] focus-within:shadow-[0_16px_32px_rgba(31,42,68,0.08)]">
         <button className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#e6ebf4] bg-white transition-colors hover:bg-[#f6f8fc]">
           <Paperclip className="h-4 w-4 text-[#667287]"/>
