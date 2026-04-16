@@ -45,7 +45,7 @@ export const chats = [
         id: '7',
         name: 'David Li',
         role: 'Clinical Trials Coordinator',
-        avatar: 'https://images.pexels.com/photos/6256/doctor-patient-hospital-health.jpg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
+        avatar: 'https://images.pexels.com/photos/6749778/pexels-photo-6749778.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
         lastMessagePreview: 'What should we standardize before site ini...',
     },
     {
