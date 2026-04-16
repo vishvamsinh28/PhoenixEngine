@@ -7,7 +7,7 @@ const tabs = [
     { id: 'chat', label: 'Chat', icon: MessageCircle },
 ];
 export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
-    return (<header className="fixed left-0 right-0 top-0 z-50 border-b border-[#e6ebf4] bg-white/88 backdrop-blur-xl">
+    return (<header className="fixed left-0 right-0 top-0 z-50 bg-white/72 backdrop-blur-xl">
       <div className="px-4 md:px-5">
         <div className="relative flex h-[72px] items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">

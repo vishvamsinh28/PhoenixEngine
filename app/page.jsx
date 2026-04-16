@@ -33,19 +33,21 @@ export default function Home() {
     return (<div className="flex h-screen flex-col overflow-hidden bg-transparent">
       <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={() => setSidebarOpen(true)}/>
 
-      <div className="flex flex-1 overflow-hidden pt-[7.25rem] md:pt-[5.5rem]">
+      <div className="flex flex-1 overflow-hidden pt-[7.25rem] md:px-0 md:pb-0 md:pt-[5.5rem]">
         {isChatTab ? (<>
             <Sidebar chats={chats} activeChatId={activeChatId} onSelectChat={setActiveChatId} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
 
-            <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <main className="flex min-w-0 flex-1 flex-col overflow-hidden md:pr-4 md:pb-4">
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(251,250,255,0.98)_38%,rgba(244,250,255,0.98)_100%)] md:rounded-t-[28px] md:shadow-[0_10px_30px_rgba(31,42,68,0.05)]">
               <ChatHeader chat={activeChat}/>
 
-              <div className="flex-1 overflow-y-auto bg-[#fbfcff] px-4 py-5 md:px-6 md:py-6">
+              <div className="flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.28)_0%,rgba(251,252,255,0.72)_100%)] px-4 py-5 md:px-6 md:py-6">
                 {currentMessages.map((msg) => (<MessageBubble key={msg.id} message={msg}/>))}
                 <div ref={messagesEndRef}/>
               </div>
 
               <ChatInput onSend={handleSend}/>
+              </div>
             </main>
           </>) : (<main className="flex flex-1 items-center justify-center p-6">
             <div className="w-full max-w-2xl rounded-[28px] border border-white/80 bg-white px-8 py-14 text-center shadow-[0_20px_60px_rgba(31,42,68,0.08)]">

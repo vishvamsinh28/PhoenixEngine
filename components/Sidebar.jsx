@@ -4,7 +4,7 @@ export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onC
     return (<>
       {isOpen && (<div className="fixed inset-0 z-30 bg-[#1f2a44]/20 backdrop-blur-[2px] md:hidden" onClick={onClose}/>)}
 
-      <aside className={`fixed left-0 top-0 z-40 flex h-full flex-col border-r border-[#e8edf6] bg-[linear-gradient(180deg,#fbfcff_0%,#f7f8fe_100%)] transition-transform duration-300 ease-in-out md:relative md:z-auto
+      <aside className={`fixed left-0 top-0 z-40 flex h-full flex-col bg-[linear-gradient(135deg,#fbf8ff_0%,#f7f4ff_52%,#f3f7ff_100%)] transition-transform duration-300 ease-in-out md:relative md:z-auto
           w-[320px] md:w-[324px] md:flex-shrink-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}>
@@ -20,7 +20,7 @@ export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onC
           </div>
         </div>
 
-        <div className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4">
+        <div className="flex-1 space-y-0.5 overflow-y-auto bg-[linear-gradient(180deg,rgba(248,244,255,0.2)_0%,rgba(243,245,255,0.5)_100%)] px-3 pb-4">
           {chats.map((chat) => (<button key={chat.id} onClick={() => {
                 onSelectChat(chat.id);
                 onClose();

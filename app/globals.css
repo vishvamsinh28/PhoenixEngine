@@ -19,8 +19,7 @@ body {
   min-height: 100vh;
   font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at top right, rgba(215, 235, 255, 0.9), transparent 24%),
-    linear-gradient(180deg, #f8fbff 0%, #f7f8fc 24%, #f7f8fc 100%);
+    linear-gradient(90deg, #fbf8ff 0%, #f7f6ff 34%, #eef7ff 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
