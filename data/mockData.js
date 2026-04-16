@@ -42,13 +42,6 @@ export const chats = [
         lastMessagePreview: 'How do regulatory agencies impact phar...',
     },
     {
-        id: '7',
-        name: 'David Li',
-        role: 'Clinical Trials Coordinator',
-        avatar: 'https://images.pexels.com/photos/6256/doctor-patient-hospital-health.jpg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
-        lastMessagePreview: 'What role do clinical trials play in the ap...',
-    },
-    {
         id: '8',
         name: 'Emma Chen',
         role: 'Oncology Nurse',
@@ -151,20 +144,6 @@ export const messagesByChat = {
             sender: 'assistant',
             message: 'Regulatory agencies like the FDA and EMA establish the requirements for drug approval, which significantly influence development timelines. Expedited pathways such as Breakthrough Therapy Designation, Fast Track, and Priority Review can compress timelines for therapies addressing unmet medical needs.',
             timestamp: '8:32 AM',
-        },
-    ],
-    '7': [
-        {
-            id: 'm1',
-            sender: 'user',
-            message: 'What role do clinical trials play in the approval process for oncology drugs?',
-            timestamp: '1:00 PM',
-        },
-        {
-            id: 'm2',
-            sender: 'assistant',
-            message: 'Clinical trials are the cornerstone of drug approval, providing the safety and efficacy data required by regulatory agencies. Phase I trials establish safety and dosing, Phase II explores efficacy, and Phase III provides definitive evidence through randomized controlled studies comparing new treatments to standard of care.',
-            timestamp: '1:02 PM',
         },
     ],
     '8': [
