@@ -12,18 +12,7 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
         <button onClick={onMenuToggle} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
           <Menu className="w-5 h-5 text-gray-600"/>
         </button>
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-            <div className="w-4 h-4 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-          <span className="font-semibold text-gray-900 text-sm hidden sm:block">Synthio Labs</span>
-        </div>
+        <img src="/logo.png" alt="Synthio Labs logo" className="h-10 w-auto object-contain"/>
       </div>
 
       <div className="flex-1 flex justify-center">

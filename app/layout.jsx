@@ -4,6 +4,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata = {
     title: 'SynthioLabs',
     description: 'Chat Streaming',
+    icons: {
+        icon: '/favicon.jpeg',
+    },
 };
 export default function RootLayout({ children, }) {
     return (<html lang="en">
