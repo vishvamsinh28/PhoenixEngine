@@ -31,12 +31,6 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
             })}
             </nav>
           </div>
-
-          <div className="flex shrink-0 justify-end md:min-w-[180px]">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-              <span className="text-xs font-semibold text-blue-600">SL</span>
-            </div>
-          </div>
         </div>
 
         <div className="pb-3 md:hidden">
