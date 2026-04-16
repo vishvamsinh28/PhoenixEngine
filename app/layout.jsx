@@ -5,7 +5,7 @@ export const metadata = {
     title: 'SynthioLabs',
     description: 'Chat Streaming',
     icons: {
-        icon: '/favicon.jpeg',
+        icon: '/icon.jpeg',
     },
 };
 export default function RootLayout({ children, }) {
