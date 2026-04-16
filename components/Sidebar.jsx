@@ -24,10 +24,10 @@ export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onC
           {chats.map((chat) => (<button key={chat.id} onClick={() => {
                 onSelectChat(chat.id);
                 onClose();
-            }} className={`group flex w-full items-center gap-3 rounded-[16px] border px-3 py-3 text-left transition-all duration-150
+            }} className={`group flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-left transition-all duration-150
                 ${activeChatId === chat.id
-                ? 'border-[#d9e4ff] bg-[#edf3ff] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]'
-                : 'border-transparent bg-transparent hover:border-[#eef2f8] hover:bg-white/70'}
+                ? 'bg-[#edf3ff]'
+                : 'bg-transparent hover:bg-white/70'}
               `}>
               <div className="relative flex-shrink-0">
                 <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5" onError={(e) => {
