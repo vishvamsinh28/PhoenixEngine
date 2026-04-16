@@ -1,14 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Check, Copy, Volume2, ThumbsUp, ThumbsDown, Zap, RotateCcw } from 'lucide-react';
-
-const MESSAGE_ACTIONS = [
-    { icon: Volume2, title: 'Read aloud' },
-    { icon: ThumbsUp, title: 'Helpful' },
-    { icon: ThumbsDown, title: 'Not helpful' },
-    { icon: Zap, title: 'Quick action' },
-    { icon: RotateCcw, title: 'Regenerate' },
-];
+import { Check, Copy } from 'lucide-react';
+import { MESSAGE_ACTIONS } from '@/data/uiConfig';
 
 export default function MessageBubble({ message }) {
     const isUser = message.sender === 'user';

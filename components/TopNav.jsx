@@ -1,11 +1,7 @@
 'use client';
-import { LayoutDashboard, TrendingUp, FileText, MessageCircle, Menu } from 'lucide-react';
-const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'insights', label: 'Insights', icon: TrendingUp },
-    { id: 'transcript', label: 'Transcript', icon: FileText },
-    { id: 'chat', label: 'Chat', icon: MessageCircle },
-];
+import { Menu } from 'lucide-react';
+import { NAV_TABS } from '@/data/uiConfig';
+
 export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
     return (<header className="fixed left-0 right-0 top-0 z-50 bg-white/72 backdrop-blur-xl">
       <div className="px-4 md:px-5">
@@ -19,7 +15,7 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
 
           <div className="hidden md:absolute md:left-1/2 md:flex md:-translate-x-1/2">
             <nav className="flex items-center gap-1 rounded-full border border-white/90 bg-white/90 p-[5px] shadow-[0_8px_22px_rgba(31,42,68,0.08),0_2px_6px_rgba(31,42,68,0.05)]">
-              {tabs.map((tab) => {
+              {NAV_TABS.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (<button key={tab.id} onClick={() => onTabChange(tab.id)} className={`flex min-w-[118px] items-center justify-center gap-2 rounded-full px-4 py-[10px] text-[15px] font-medium transition-all duration-200 ${isActive
@@ -37,7 +33,7 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
 
         <div className="pb-4 md:hidden">
           <nav className="no-scrollbar flex items-center gap-2 overflow-x-auto">
-            {tabs.map((tab) => {
+            {NAV_TABS.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (<button key={tab.id} onClick={() => onTabChange(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition-all duration-200 ${isActive

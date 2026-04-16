@@ -5,7 +5,7 @@ import { chats as initialChats, messagesByChat, mockAssistantReplies } from '@/d
 import { STREAM_START_DELAY_MS, STREAM_STEP_MS, formatPreview } from '@/lib/chatUtils';
 
 export function useMockChat() {
-    const [activeChatId, setActiveChatId] = useState('1');
+    const [activeChatId, setActiveChatId] = useState(initialChats[0]?.id ?? '');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [chatList, setChatList] = useState(initialChats);
     const [messages, setMessages] = useState(messagesByChat);
