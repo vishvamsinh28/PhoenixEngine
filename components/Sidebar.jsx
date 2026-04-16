@@ -1,5 +1,7 @@
 'use client';
 import { SquarePen, X } from 'lucide-react';
+import { applyAvatarFallback } from '@/lib/chatUtils';
+
 export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onClose }) {
     return (<>
       {isOpen && (<div className="fixed inset-0 z-30 bg-[#1f2a44]/22 backdrop-blur-[6px] md:hidden" onClick={onClose}/>)}
@@ -29,10 +31,7 @@ export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onC
                 : 'bg-transparent hover:bg-white/70'}
               `}>
               <div className="relative flex-shrink-0">
-                <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5" onError={(e) => {
-                const target = e.target;
-                target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.name)}&background=e0e7ff&color=3730a3&size=80`;
-            }}/>
+                <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5" onError={(event) => applyAvatarFallback(event, chat.name)}/>
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`truncate text-[15px] font-semibold tracking-[-0.01em] ${activeChatId === chat.id ? 'text-[#264fcb]' : 'text-[#25314d]'}`}>

@@ -1,13 +1,12 @@
 'use client';
 import { Video, Phone } from 'lucide-react';
+import { applyAvatarFallback } from '@/lib/chatUtils';
+
 export default function ChatHeader({ chat }) {
     return (<div className="flex flex-shrink-0 items-center justify-between border-b border-[#e8edf6] bg-white px-4 py-4 md:px-6">
       <div className="flex items-center gap-3">
         <div className="relative">
-          <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5 md:h-12 md:w-12" onError={(e) => {
-            const target = e.target;
-            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.name)}&background=e0e7ff&color=3730a3&size=80`;
-        }}/>
+          <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5 md:h-12 md:w-12" onError={(event) => applyAvatarFallback(event, chat.name)}/>
         </div>
         <div>
           <h3 className="text-[15px] font-semibold tracking-[-0.02em] text-[#1e2a45] md:text-[16px]">{chat.name}</h3>

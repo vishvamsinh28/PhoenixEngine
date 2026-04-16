@@ -1,6 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Check, Copy, Volume2, ThumbsUp, ThumbsDown, Zap, RotateCcw } from 'lucide-react';
+
+const MESSAGE_ACTIONS = [
+    { icon: Volume2, title: 'Read aloud' },
+    { icon: ThumbsUp, title: 'Helpful' },
+    { icon: ThumbsDown, title: 'Not helpful' },
+    { icon: Zap, title: 'Quick action' },
+    { icon: RotateCcw, title: 'Regenerate' },
+];
+
 export default function MessageBubble({ message }) {
     const isUser = message.sender === 'user';
     const isStreamingAssistant = !isUser && !message.message;
@@ -45,11 +54,7 @@ export default function MessageBubble({ message }) {
         </div>
         {!isStreamingAssistant && (<div className="ml-1 mt-3 flex items-center gap-1.5">
             <ActionButton icon={copied ? Check : Copy} title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} active={copied}/>
-            <ActionButton icon={Volume2} title="Read aloud"/>
-            <ActionButton icon={ThumbsUp} title="Helpful"/>
-            <ActionButton icon={ThumbsDown} title="Not helpful"/>
-            <ActionButton icon={Zap} title="Quick action"/>
-            <ActionButton icon={RotateCcw} title="Regenerate"/>
+            {MESSAGE_ACTIONS.map((action) => (<ActionButton key={action.title} icon={action.icon} title={action.title}/>))}
           </div>)}
       </div>
     </div>);

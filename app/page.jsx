@@ -1,107 +1,22 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TopNav from '@/components/TopNav';
 import Sidebar from '@/components/Sidebar';
 import ChatHeader from '@/components/ChatHeader';
 import MessageBubble from '@/components/MessageBubble';
 import ChatInput from '@/components/ChatInput';
-import { chats as initialChats, messagesByChat, mockAssistantReplies } from '@/data/mockData';
-
-const STREAM_START_DELAY_MS = 350;
-const STREAM_STEP_MS = 40;
-
-const formatPreview = (text) => text.length > 42 ? `${text.slice(0, 39)}...` : text;
+import { useMockChat } from '@/hooks/useMockChat';
 
 export default function Home() {
     const [activeTab, setActiveTab] = useState('chat');
-    const [activeChatId, setActiveChatId] = useState('1');
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [chatList, setChatList] = useState(initialChats);
-    const [messages, setMessages] = useState(messagesByChat);
-    const [isStreaming, setIsStreaming] = useState(false);
+    const { activeChat, activeChatId, chatList, currentMessages, isStreaming, sendMessage, setActiveChatId, setSidebarOpen, sidebarOpen } = useMockChat();
     const messagesEndRef = useRef(null);
-    const streamStartTimeoutRef = useRef(null);
-    const streamIntervalRef = useRef(null);
-    const activeChat = chatList.find((c) => c.id === activeChatId);
-    const currentMessages = messages[activeChatId] || [];
     const isChatTab = activeTab === 'chat';
-
-    const clearStreamingTimers = () => {
-        if (streamStartTimeoutRef.current) {
-            clearTimeout(streamStartTimeoutRef.current);
-            streamStartTimeoutRef.current = null;
-        }
-        if (streamIntervalRef.current) {
-            clearInterval(streamIntervalRef.current);
-            streamIntervalRef.current = null;
-        }
-        setIsStreaming(false);
-    };
-
-    const updateChatPreview = (chatId, preview) => {
-        setChatList((prev) => prev.map((chat) => chat.id === chatId
-            ? { ...chat, lastMessagePreview: formatPreview(preview) }
-            : chat));
-    };
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [currentMessages]);
 
-    useEffect(() => () => {
-        clearStreamingTimers();
-    }, []);
-
-    const handleSend = (text) => {
-        if (isStreaming)
-            return;
-        clearStreamingTimers();
-        setIsStreaming(true);
-        const userMessageId = `m${Date.now()}`;
-        const assistantMessageId = `${userMessageId}-assistant`;
-        const chatId = activeChatId;
-        const randomReply = mockAssistantReplies[Math.floor(Math.random() * mockAssistantReplies.length)];
-        const responseParts = randomReply.split(/(\s+)/);
-        let streamIndex = 0;
-        const newMessage = {
-            id: userMessageId,
-            sender: 'user',
-            message: text,
-        };
-        setMessages((prev) => ({
-            ...prev,
-            [chatId]: [
-                ...(prev[chatId] || []),
-                newMessage,
-                {
-                    id: assistantMessageId,
-                    sender: 'assistant',
-                    message: '',
-                },
-            ],
-        }));
-        updateChatPreview(chatId, text);
-
-        streamStartTimeoutRef.current = setTimeout(() => {
-            streamIntervalRef.current = setInterval(() => {
-                const nextChunkSize = Math.min(responseParts.length - streamIndex, Math.floor(Math.random() * 3) + 1);
-                streamIndex += nextChunkSize;
-                const partialMessage = responseParts.slice(0, streamIndex).join('');
-
-                setMessages((prev) => ({
-                    ...prev,
-                    [chatId]: (prev[chatId] || []).map((message) => message.id === assistantMessageId
-                        ? { ...message, message: partialMessage }
-                        : message),
-                }));
-                updateChatPreview(chatId, partialMessage);
-
-                if (streamIndex >= responseParts.length) {
-                    clearStreamingTimers();
-                }
-            }, STREAM_STEP_MS);
-        }, STREAM_START_DELAY_MS);
-    };
     return (<div className="flex h-screen flex-col overflow-hidden bg-transparent">
       <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={() => setSidebarOpen(true)}/>
 
@@ -118,7 +33,7 @@ export default function Home() {
                 <div ref={messagesEndRef}/>
               </div>
 
-              <ChatInput onSend={handleSend} disabled={isStreaming} recipientName={activeChat?.name}/>
+              <ChatInput onSend={sendMessage} disabled={isStreaming} recipientName={activeChat?.name}/>
               </div>
             </main>
           </>) : (<main className="flex flex-1 items-center justify-center p-6">
