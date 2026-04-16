@@ -15,7 +15,14 @@ body {
 
 /* Optional: smooth fonts */
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-[#f7f8fc] text-[#1f2a44];
+  min-height: 100vh;
+  font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(215, 235, 255, 0.9), transparent 24%),
+    linear-gradient(180deg, #f8fbff 0%, #f7f8fc 24%, #f7f8fc 100%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .no-scrollbar {
@@ -25,4 +32,9 @@ body {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+button,
+input {
+  font: inherit;
 }

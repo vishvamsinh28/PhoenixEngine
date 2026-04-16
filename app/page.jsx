@@ -30,32 +30,32 @@ export default function Home() {
             [activeChatId]: [...(prev[activeChatId] || []), newMessage],
         }));
     };
-    return (<div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+    return (<div className="flex h-screen flex-col overflow-hidden bg-transparent">
       <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={() => setSidebarOpen(true)}/>
 
-      <div className="flex flex-1 overflow-hidden pt-[6.5rem] md:pt-16">
+      <div className="flex flex-1 overflow-hidden pt-[7.25rem] md:pt-[5.5rem]">
         {isChatTab ? (<>
             <Sidebar chats={chats} activeChatId={activeChatId} onSelectChat={setActiveChatId} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
 
-            <main className="flex-1 flex flex-col overflow-hidden min-w-0">
+            <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
               <ChatHeader chat={activeChat}/>
 
-              <div className="flex-1 overflow-y-auto py-4 space-y-1">
+              <div className="flex-1 overflow-y-auto bg-[#fbfcff] px-4 py-5 md:px-6 md:py-6">
                 {currentMessages.map((msg) => (<MessageBubble key={msg.id} message={msg}/>))}
                 <div ref={messagesEndRef}/>
               </div>
 
               <ChatInput onSend={handleSend}/>
             </main>
-          </>) : (<main className="flex-1 flex items-center justify-center p-6">
-            <div className="w-full max-w-2xl rounded-3xl border border-gray-200 bg-white px-8 py-14 text-center shadow-sm">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
+          </>) : (<main className="flex flex-1 items-center justify-center p-6">
+            <div className="w-full max-w-2xl rounded-[28px] border border-white/80 bg-white px-8 py-14 text-center shadow-[0_20px_60px_rgba(31,42,68,0.08)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#3f6df2]">
                 {activeTab}
               </p>
-              <h1 className="mt-4 text-3xl font-semibold text-gray-900">
+              <h1 className="mt-4 text-3xl font-semibold text-[#1f2a44]">
                 We are currently working on bringing this feature to you soon.
               </h1>
-              <p className="mt-3 text-sm text-gray-500">
+              <p className="mt-3 text-sm text-[#8a94a8]">
                 Switch to the Chat tab to continue your conversations.
               </p>
             </div>

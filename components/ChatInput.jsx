@@ -16,18 +16,18 @@ export default function ChatInput({ onSend }) {
             handleSend();
         }
     };
-    return (<div className="px-4 md:px-6 py-4 bg-white border-t border-gray-100 flex-shrink-0">
-      <div className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3 border border-gray-200 focus-within:border-blue-300 focus-within:bg-white transition-all">
-        <button className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
-          <Paperclip className="w-4 h-4 text-gray-400"/>
+    return (<div className="flex-shrink-0 border-t border-[#e8edf6] bg-white px-4 py-4 md:px-6">
+      <div className="flex items-center gap-3 rounded-[18px] border border-[#e2e8f3] bg-white px-4 py-3 shadow-[0_10px_30px_rgba(31,42,68,0.06)] transition-all focus-within:border-[#c9d8ff] focus-within:shadow-[0_16px_32px_rgba(31,42,68,0.08)]">
+        <button className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#e6ebf4] bg-white transition-colors hover:bg-[#f6f8fc]">
+          <Paperclip className="h-4 w-4 text-[#667287]"/>
         </button>
 
-        <input type="text" value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={handleKeyDown} placeholder="Type a message..." className="flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"/>
+        <input type="text" value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={handleKeyDown} placeholder="Type a message..." className="flex-1 bg-transparent text-[15px] text-[#27314a] placeholder-[#a0a9bb] outline-none"/>
 
-        <button onClick={handleSend} disabled={!value.trim()} className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${value.trim()
-            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
-            : 'bg-blue-200 text-blue-400 cursor-not-allowed'}`}>
-          <ArrowUp className="w-4 h-4"/>
+        <button onClick={handleSend} disabled={!value.trim()} className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-all ${value.trim()
+            ? 'bg-[#3f6df2] text-white shadow-[0_10px_24px_rgba(63,109,242,0.34)] hover:bg-[#2f66ea]'
+            : 'bg-[#d9e6ff] text-[#7fa3f7] cursor-not-allowed'}`}>
+          <ArrowUp className="h-4 w-4"/>
         </button>
       </div>
     </div>);

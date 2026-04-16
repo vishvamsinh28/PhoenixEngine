@@ -1,26 +1,26 @@
 'use client';
 import { Video, Phone } from 'lucide-react';
 export default function ChatHeader({ chat }) {
-    return (<div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white flex-shrink-0">
+    return (<div className="flex flex-shrink-0 items-center justify-between border-b border-[#e8edf6] bg-white px-4 py-4 md:px-6">
       <div className="flex items-center gap-3">
         <div className="relative">
-          <img src={chat.avatar} alt={chat.name} className="w-11 h-11 rounded-full object-cover" onError={(e) => {
+          <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5 md:h-12 md:w-12" onError={(e) => {
             const target = e.target;
             target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.name)}&background=e0e7ff&color=3730a3&size=80`;
         }}/>
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900 text-sm">{chat.name}</h3>
-          <p className="text-xs text-gray-400">{chat.role}</p>
+          <h3 className="text-[15px] font-semibold tracking-[-0.02em] text-[#1e2a45] md:text-[16px]">{chat.name}</h3>
+          <p className="text-[13px] text-[#96a0b5]">{chat.role}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-1">
-        <button className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 hover:text-gray-700">
-          <Video className="w-5 h-5"/>
+      <div className="flex items-center gap-2">
+        <button className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e6ebf4] bg-white text-[#4f5d78] shadow-[0_1px_2px_rgba(31,42,68,0.02)] transition-colors hover:bg-[#f6f8fc]">
+          <Video className="h-4 w-4"/>
         </button>
-        <button className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 hover:text-gray-700">
-          <Phone className="w-5 h-5"/>
+        <button className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e6ebf4] bg-white text-[#4f5d78] shadow-[0_1px_2px_rgba(31,42,68,0.02)] transition-colors hover:bg-[#f6f8fc]">
+          <Phone className="h-4 w-4"/>
         </button>
       </div>
     </div>);
