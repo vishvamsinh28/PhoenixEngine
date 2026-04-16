@@ -9,7 +9,7 @@ const tabs = [
 export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
     return (<header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md">
       <div className="px-4 md:px-6">
-        <div className="flex h-16 items-center justify-between gap-3">
+        <div className="relative flex h-16 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <button onClick={onMenuToggle} className="shrink-0 rounded-lg p-2 transition-colors hover:bg-gray-100 md:hidden">
           <Menu className="w-5 h-5 text-gray-600"/>
@@ -17,7 +17,7 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
             <img src="/logo.png" alt="Synthio Labs logo" className="h-9 w-auto max-w-[150px] object-contain sm:h-10 md:max-w-none"/>
           </div>
 
-          <div className="hidden flex-1 justify-center md:flex">
+          <div className="hidden md:absolute md:left-1/2 md:flex md:-translate-x-1/2">
             <nav className="flex items-center gap-0.5 rounded-full bg-gray-100 p-1">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -31,6 +31,8 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
             })}
             </nav>
           </div>
+
+          <div className="hidden md:block md:w-[150px] md:flex-shrink-0" aria-hidden="true"/>
         </div>
 
         <div className="pb-3 md:hidden">
