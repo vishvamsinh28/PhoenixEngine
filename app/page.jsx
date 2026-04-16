@@ -12,7 +12,7 @@ export default function Home() {
     const { activeChat, activeChatId, chatList, currentMessages, isStreaming, sendMessage, setActiveChatId, setSidebarOpen, sidebarOpen } = useMockChat();
     const messagesEndRef = useRef(null);
     const isChatTab = activeTab === 'chat';
-    const openSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
+    const toggleSidebar = useCallback(() => setSidebarOpen((prev) => !prev), [setSidebarOpen]);
     const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
 
     useEffect(() => {
@@ -20,7 +20,7 @@ export default function Home() {
     }, [currentMessages]);
 
     return (<div className="flex h-screen flex-col overflow-hidden bg-transparent">
-      <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={openSidebar}/>
+      <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={toggleSidebar}/>
 
       <div className="flex flex-1 overflow-hidden pt-[7.25rem] md:px-0 md:pb-4 md:pt-[5.5rem]">
         {isChatTab ? (<>
