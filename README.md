@@ -2,6 +2,9 @@
 
 This project is a responsive mock chat experience built with Next.js and Tailwind CSS. It focuses on UI polish, reusable components, and a lightweight mock streaming flow for assistant replies.
 
+Live demo:
+- [synthioassignment.vercel.app](https://synthioassignment.vercel.app/)
+
 ## Setup
 
 Requirements:
