@@ -161,3 +161,10 @@ export const messagesByChat = {
         },
     ],
 };
+
+export const mockAssistantReplies = [
+    ...new Set(Object.values(messagesByChat)
+        .flatMap((messages) => messages
+        .filter((message) => message.sender === 'assistant')
+        .map((message) => message.message))),
+];

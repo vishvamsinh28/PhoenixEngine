@@ -5,37 +5,109 @@ import Sidebar from '@/components/Sidebar';
 import ChatHeader from '@/components/ChatHeader';
 import MessageBubble from '@/components/MessageBubble';
 import ChatInput from '@/components/ChatInput';
-import { chats, messagesByChat } from '@/data/mockData';
+import { chats as initialChats, messagesByChat, mockAssistantReplies } from '@/data/mockData';
+
+const STREAM_START_DELAY_MS = 350;
+const STREAM_STEP_MS = 40;
+
+const formatPreview = (text) => text.length > 42 ? `${text.slice(0, 39)}...` : text;
+
+const formatTimestamp = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
 export default function Home() {
     const [activeTab, setActiveTab] = useState('chat');
     const [activeChatId, setActiveChatId] = useState('1');
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [chatList, setChatList] = useState(initialChats);
     const [messages, setMessages] = useState(messagesByChat);
     const messagesEndRef = useRef(null);
-    const activeChat = chats.find((c) => c.id === activeChatId);
+    const streamStartTimeoutRef = useRef(null);
+    const streamIntervalRef = useRef(null);
+    const activeChat = chatList.find((c) => c.id === activeChatId);
     const currentMessages = messages[activeChatId] || [];
     const isChatTab = activeTab === 'chat';
+
+    const clearStreamingTimers = () => {
+        if (streamStartTimeoutRef.current) {
+            clearTimeout(streamStartTimeoutRef.current);
+            streamStartTimeoutRef.current = null;
+        }
+        if (streamIntervalRef.current) {
+            clearInterval(streamIntervalRef.current);
+            streamIntervalRef.current = null;
+        }
+    };
+
+    const updateChatPreview = (chatId, preview) => {
+        setChatList((prev) => prev.map((chat) => chat.id === chatId
+            ? { ...chat, lastMessagePreview: formatPreview(preview) }
+            : chat));
+    };
+
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [currentMessages]);
+
+    useEffect(() => () => {
+        clearStreamingTimers();
+    }, []);
+
     const handleSend = (text) => {
+        clearStreamingTimers();
+        const timestamp = formatTimestamp();
+        const userMessageId = `m${Date.now()}`;
+        const assistantMessageId = `${userMessageId}-assistant`;
+        const chatId = activeChatId;
+        const randomReply = mockAssistantReplies[Math.floor(Math.random() * mockAssistantReplies.length)];
+        const responseParts = randomReply.split(/(\s+)/);
+        let streamIndex = 0;
         const newMessage = {
-            id: `m${Date.now()}`,
+            id: userMessageId,
             sender: 'user',
             message: text,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp,
         };
         setMessages((prev) => ({
             ...prev,
-            [activeChatId]: [...(prev[activeChatId] || []), newMessage],
+            [chatId]: [
+                ...(prev[chatId] || []),
+                newMessage,
+                {
+                    id: assistantMessageId,
+                    sender: 'assistant',
+                    message: '',
+                    timestamp,
+                },
+            ],
         }));
+        updateChatPreview(chatId, text);
+
+        streamStartTimeoutRef.current = setTimeout(() => {
+            streamIntervalRef.current = setInterval(() => {
+                const nextChunkSize = Math.min(responseParts.length - streamIndex, Math.floor(Math.random() * 3) + 1);
+                streamIndex += nextChunkSize;
+                const partialMessage = responseParts.slice(0, streamIndex).join('');
+
+                setMessages((prev) => ({
+                    ...prev,
+                    [chatId]: (prev[chatId] || []).map((message) => message.id === assistantMessageId
+                        ? { ...message, message: partialMessage, timestamp: formatTimestamp() }
+                        : message),
+                }));
+                updateChatPreview(chatId, partialMessage);
+
+                if (streamIndex >= responseParts.length) {
+                    clearStreamingTimers();
+                }
+            }, STREAM_STEP_MS);
+        }, STREAM_START_DELAY_MS);
     };
     return (<div className="flex h-screen flex-col overflow-hidden bg-transparent">
       <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={() => setSidebarOpen(true)}/>
 
       <div className="flex flex-1 overflow-hidden pt-[7.25rem] md:px-0 md:pb-4 md:pt-[5.5rem]">
         {isChatTab ? (<>
-            <Sidebar chats={chats} activeChatId={activeChatId} onSelectChat={setActiveChatId} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
+            <Sidebar chats={chatList} activeChatId={activeChatId} onSelectChat={setActiveChatId} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
 
             <main className="flex min-w-0 flex-1 flex-col overflow-hidden md:pr-4">
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(251,250,255,0.98)_38%,rgba(244,250,255,0.98)_100%)] md:rounded-t-[28px] md:shadow-[0_10px_30px_rgba(31,42,68,0.05)]">
