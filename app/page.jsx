@@ -41,7 +41,7 @@ export default function Home() {
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(251,250,255,0.98)_38%,rgba(244,250,255,0.98)_100%)] md:rounded-t-[28px] md:shadow-[0_10px_30px_rgba(31,42,68,0.05)]">
               <ChatHeader chat={activeChat}/>
 
-              <div className="flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.28)_0%,rgba(251,252,255,0.72)_100%)] px-4 py-5 md:px-6 md:py-6">
+              <div className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.28)_0%,rgba(251,252,255,0.72)_100%)] px-4 py-5 md:px-6 md:py-6">
                 {currentMessages.map((msg) => (<MessageBubble key={msg.id} message={msg}/>))}
                 <div ref={messagesEndRef}/>
               </div>
