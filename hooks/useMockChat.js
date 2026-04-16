@@ -1,17 +1,45 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { chats as initialChats, messagesByChat, mockAssistantReplies } from '@/data/mockData';
 import { STREAM_START_DELAY_MS, STREAM_STEP_MS, formatPreview } from '@/lib/chatUtils';
+
+const getRandomReply = () => mockAssistantReplies[Math.floor(Math.random() * mockAssistantReplies.length)];
+
+const buildStreamingMessages = (existingMessages, userMessageId, assistantMessageId, text) => [
+    ...existingMessages,
+    {
+        id: userMessageId,
+        sender: 'user',
+        message: text,
+    },
+    {
+        id: assistantMessageId,
+        sender: 'assistant',
+        message: '',
+    },
+];
+
+const updateStreamingMessage = (messages, assistantMessageId, partialMessage) => messages.map((message) => message.id === assistantMessageId
+    ? { ...message, message: partialMessage }
+    : message);
 
 export function useMockChat() {
     const [activeChatId, setActiveChatId] = useState(initialChats[0]?.id ?? '');
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [chatList, setChatList] = useState(initialChats);
     const [messages, setMessages] = useState(messagesByChat);
     const [isStreaming, setIsStreaming] = useState(false);
     const streamStartTimeoutRef = useRef(null);
     const streamIntervalRef = useRef(null);
+
+    const chatList = useMemo(() => initialChats.map((chat) => {
+        const chatMessages = messages[chat.id] || [];
+        const lastMessage = chatMessages[chatMessages.length - 1];
+        return {
+            ...chat,
+            lastMessagePreview: lastMessage ? formatPreview(lastMessage.message) : chat.lastMessagePreview,
+        };
+    }), [messages]);
 
     const activeChat = chatList.find((chat) => chat.id === activeChatId) ?? chatList[0];
     const currentMessages = messages[activeChatId] || [];
@@ -28,12 +56,6 @@ export function useMockChat() {
         setIsStreaming(false);
     };
 
-    const updateChatPreview = (chatId, preview) => {
-        setChatList((prev) => prev.map((chat) => chat.id === chatId
-            ? { ...chat, lastMessagePreview: formatPreview(preview) }
-            : chat));
-    };
-
     const sendMessage = (text) => {
         if (isStreaming)
             return;
@@ -44,27 +66,14 @@ export function useMockChat() {
         const chatId = activeChatId;
         const userMessageId = `m${Date.now()}`;
         const assistantMessageId = `${userMessageId}-assistant`;
-        const randomReply = mockAssistantReplies[Math.floor(Math.random() * mockAssistantReplies.length)];
+        const randomReply = getRandomReply();
         const responseParts = randomReply.split(/(\s+)/);
         let streamIndex = 0;
 
         setMessages((prev) => ({
             ...prev,
-            [chatId]: [
-                ...(prev[chatId] || []),
-                {
-                    id: userMessageId,
-                    sender: 'user',
-                    message: text,
-                },
-                {
-                    id: assistantMessageId,
-                    sender: 'assistant',
-                    message: '',
-                },
-            ],
+            [chatId]: buildStreamingMessages(prev[chatId] || [], userMessageId, assistantMessageId, text),
         }));
-        updateChatPreview(chatId, text);
 
         streamStartTimeoutRef.current = setTimeout(() => {
             streamIntervalRef.current = setInterval(() => {
@@ -74,11 +83,8 @@ export function useMockChat() {
 
                 setMessages((prev) => ({
                     ...prev,
-                    [chatId]: (prev[chatId] || []).map((message) => message.id === assistantMessageId
-                        ? { ...message, message: partialMessage }
-                        : message),
+                    [chatId]: updateStreamingMessage(prev[chatId] || [], assistantMessageId, partialMessage),
                 }));
-                updateChatPreview(chatId, partialMessage);
 
                 if (streamIndex >= responseParts.length) {
                     clearStreamingTimers();

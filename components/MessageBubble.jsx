@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { MESSAGE_ACTIONS } from '@/data/uiConfig';
+import IconActionButton from '@/components/IconActionButton';
 
 export default function MessageBubble({ message }) {
     const isUser = message.sender === 'user';
@@ -46,16 +47,9 @@ export default function MessageBubble({ message }) {
               </p>)))}
         </div>
         {!isStreamingAssistant && (<div className="ml-1 mt-3 flex items-center gap-1.5">
-            <ActionButton icon={copied ? Check : Copy} title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} active={copied}/>
-            {MESSAGE_ACTIONS.map((action) => (<ActionButton key={action.title} icon={action.icon} title={action.title}/>))}
+            <IconActionButton icon={copied ? Check : Copy} title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} active={copied} buttonClassName="p-1.5"/>
+            {MESSAGE_ACTIONS.map((action) => (<IconActionButton key={action.title} icon={action.icon} title={action.title} buttonClassName="p-1.5"/>))}
           </div>)}
       </div>
     </div>);
-}
-function ActionButton({ icon: Icon, title, onClick, active = false }) {
-    return (<button title={title} onClick={onClick} className={`rounded-lg p-1.5 transition-colors ${active
-            ? 'bg-white text-[#2f66ea]'
-            : 'text-[#6f7b91] hover:bg-white hover:text-[#1f2a44]'}`}>
-      <Icon className="h-[14px] w-[14px]"/>
-    </button>);
 }

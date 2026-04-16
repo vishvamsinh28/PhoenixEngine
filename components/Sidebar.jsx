@@ -1,8 +1,14 @@
 'use client';
+import { useCallback } from 'react';
 import { SquarePen, X } from 'lucide-react';
-import { applyAvatarFallback } from '@/lib/chatUtils';
+import ChatListItem from '@/components/ChatListItem';
 
 export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onClose }) {
+    const handleSelectChat = useCallback((chatId) => {
+        onSelectChat(chatId);
+        onClose();
+    }, [onClose, onSelectChat]);
+
     return (<>
       {isOpen && (<div className="fixed inset-0 z-30 bg-[#1f2a44]/22 backdrop-blur-[6px] md:hidden" onClick={onClose}/>)}
 
@@ -22,24 +28,7 @@ export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onC
         </div>
 
         <div className="no-scrollbar flex-1 space-y-0.5 overflow-y-auto bg-[linear-gradient(180deg,rgba(248,244,255,0.2)_0%,rgba(243,245,255,0.5)_100%)] px-3 pb-4">
-          {chats.map((chat) => (<button key={chat.id} onClick={() => {
-                onSelectChat(chat.id);
-                onClose();
-            }} className={`group flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-left transition-all duration-150
-                ${activeChatId === chat.id
-                ? 'bg-[#edf3ff]'
-                : 'bg-transparent hover:bg-white/70'}
-              `}>
-              <div className="relative flex-shrink-0">
-                <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5" onError={(event) => applyAvatarFallback(event, chat.name)}/>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`truncate text-[15px] font-semibold tracking-[-0.01em] ${activeChatId === chat.id ? 'text-[#264fcb]' : 'text-[#25314d]'}`}>
-                  {chat.name}
-                </p>
-                <p className="mt-1 truncate text-[13px] text-[#9aa4b7]">{chat.lastMessagePreview}</p>
-              </div>
-            </button>))}
+          {chats.map((chat) => (<ChatListItem key={chat.id} id={chat.id} name={chat.name} avatar={chat.avatar} lastMessagePreview={chat.lastMessagePreview} isActive={activeChatId === chat.id} onSelect={handleSelectChat}/>))}
         </div>
       </aside>
     </>);

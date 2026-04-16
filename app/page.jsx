@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import TopNav from '@/components/TopNav';
 import Sidebar from '@/components/Sidebar';
 import ChatHeader from '@/components/ChatHeader';
@@ -12,17 +12,19 @@ export default function Home() {
     const { activeChat, activeChatId, chatList, currentMessages, isStreaming, sendMessage, setActiveChatId, setSidebarOpen, sidebarOpen } = useMockChat();
     const messagesEndRef = useRef(null);
     const isChatTab = activeTab === 'chat';
+    const openSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
+    const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [currentMessages]);
 
     return (<div className="flex h-screen flex-col overflow-hidden bg-transparent">
-      <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={() => setSidebarOpen(true)}/>
+      <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={openSidebar}/>
 
       <div className="flex flex-1 overflow-hidden pt-[7.25rem] md:px-0 md:pb-4 md:pt-[5.5rem]">
         {isChatTab ? (<>
-            <Sidebar chats={chatList} activeChatId={activeChatId} onSelectChat={setActiveChatId} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
+            <Sidebar chats={chatList} activeChatId={activeChatId} onSelectChat={setActiveChatId} isOpen={sidebarOpen} onClose={closeSidebar}/>
 
             <main className="flex min-w-0 flex-1 flex-col overflow-hidden md:pr-4">
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(251,250,255,0.98)_38%,rgba(244,250,255,0.98)_100%)] md:rounded-t-[28px] md:shadow-[0_10px_30px_rgba(31,42,68,0.05)]">
