@@ -1,8 +1,28 @@
 'use client';
-import { Copy, Volume2, ThumbsUp, ThumbsDown, Zap, RotateCcw } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Check, Copy, Volume2, ThumbsUp, ThumbsDown, Zap, RotateCcw } from 'lucide-react';
 export default function MessageBubble({ message }) {
     const isUser = message.sender === 'user';
     const isStreamingAssistant = !isUser && !message.message;
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!copied)
+            return;
+        const timeoutId = window.setTimeout(() => setCopied(false), 1500);
+        return () => window.clearTimeout(timeoutId);
+    }, [copied]);
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(message.message);
+            setCopied(true);
+        }
+        catch {
+            setCopied(false);
+        }
+    };
+
     if (isUser) {
         return (<div className="flex justify-end py-3">
         <div className="max-w-[88%] md:max-w-[42rem]">
@@ -24,7 +44,7 @@ export default function MessageBubble({ message }) {
               </p>)))}
         </div>
         {!isStreamingAssistant && (<div className="ml-1 mt-3 flex items-center gap-1.5">
-            <ActionButton icon={Copy} title="Copy"/>
+            <ActionButton icon={copied ? Check : Copy} title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} active={copied}/>
             <ActionButton icon={Volume2} title="Read aloud"/>
             <ActionButton icon={ThumbsUp} title="Helpful"/>
             <ActionButton icon={ThumbsDown} title="Not helpful"/>
@@ -34,8 +54,10 @@ export default function MessageBubble({ message }) {
       </div>
     </div>);
 }
-function ActionButton({ icon: Icon, title }) {
-    return (<button title={title} className="rounded-lg p-1.5 text-[#6f7b91] transition-colors hover:bg-white hover:text-[#1f2a44]">
+function ActionButton({ icon: Icon, title, onClick, active = false }) {
+    return (<button title={title} onClick={onClick} className={`rounded-lg p-1.5 transition-colors ${active
+            ? 'bg-white text-[#2f66ea]'
+            : 'text-[#6f7b91] hover:bg-white hover:text-[#1f2a44]'}`}>
       <Icon className="h-[14px] w-[14px]"/>
     </button>);
 }

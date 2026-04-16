@@ -18,6 +18,7 @@ export default function Home() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [chatList, setChatList] = useState(initialChats);
     const [messages, setMessages] = useState(messagesByChat);
+    const [isStreaming, setIsStreaming] = useState(false);
     const messagesEndRef = useRef(null);
     const streamStartTimeoutRef = useRef(null);
     const streamIntervalRef = useRef(null);
@@ -34,6 +35,7 @@ export default function Home() {
             clearInterval(streamIntervalRef.current);
             streamIntervalRef.current = null;
         }
+        setIsStreaming(false);
     };
 
     const updateChatPreview = (chatId, preview) => {
@@ -51,7 +53,10 @@ export default function Home() {
     }, []);
 
     const handleSend = (text) => {
+        if (isStreaming)
+            return;
         clearStreamingTimers();
+        setIsStreaming(true);
         const userMessageId = `m${Date.now()}`;
         const assistantMessageId = `${userMessageId}-assistant`;
         const chatId = activeChatId;
@@ -113,7 +118,7 @@ export default function Home() {
                 <div ref={messagesEndRef}/>
               </div>
 
-              <ChatInput onSend={handleSend}/>
+              <ChatInput onSend={handleSend} disabled={isStreaming} recipientName={activeChat?.name}/>
               </div>
             </main>
           </>) : (<main className="flex flex-1 items-center justify-center p-6">
