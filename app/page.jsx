@@ -32,7 +32,7 @@ export default function Home() {
     return (<div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
       <TopNav activeTab={activeTab} onTabChange={setActiveTab} onMenuToggle={() => setSidebarOpen(true)}/>
 
-      <div className="flex flex-1 overflow-hidden pt-16">
+      <div className="flex flex-1 overflow-hidden pt-[6.5rem] md:pt-16">
         <Sidebar chats={chats} activeChatId={activeChatId} onSelectChat={setActiveChatId} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
 
         <main className="flex-1 flex flex-col overflow-hidden min-w-0">
