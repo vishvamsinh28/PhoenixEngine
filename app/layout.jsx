@@ -1,6 +1,6 @@
 import './globals.css';
 export const metadata = {
-    title: 'SynthioLabs',
+    title: 'Synthiolabs',
     description: 'Chat Streaming',
     icons: {
         icon: '/icon.jpeg',

@@ -12,8 +12,6 @@ const STREAM_STEP_MS = 40;
 
 const formatPreview = (text) => text.length > 42 ? `${text.slice(0, 39)}...` : text;
 
-const formatTimestamp = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
 export default function Home() {
     const [activeTab, setActiveTab] = useState('chat');
     const [activeChatId, setActiveChatId] = useState('1');
@@ -54,7 +52,6 @@ export default function Home() {
 
     const handleSend = (text) => {
         clearStreamingTimers();
-        const timestamp = formatTimestamp();
         const userMessageId = `m${Date.now()}`;
         const assistantMessageId = `${userMessageId}-assistant`;
         const chatId = activeChatId;
@@ -65,7 +62,6 @@ export default function Home() {
             id: userMessageId,
             sender: 'user',
             message: text,
-            timestamp,
         };
         setMessages((prev) => ({
             ...prev,
@@ -76,7 +72,6 @@ export default function Home() {
                     id: assistantMessageId,
                     sender: 'assistant',
                     message: '',
-                    timestamp,
                 },
             ],
         }));
@@ -91,7 +86,7 @@ export default function Home() {
                 setMessages((prev) => ({
                     ...prev,
                     [chatId]: (prev[chatId] || []).map((message) => message.id === assistantMessageId
-                        ? { ...message, message: partialMessage, timestamp: formatTimestamp() }
+                        ? { ...message, message: partialMessage }
                         : message),
                 }));
                 updateChatPreview(chatId, partialMessage);
