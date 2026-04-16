@@ -34,7 +34,6 @@ export default function Sidebar({ chats, activeChatId, onSelectChat, isOpen, onC
                 const target = e.target;
                 target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.name)}&background=e0e7ff&color=3730a3&size=80`;
             }}/>
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white rounded-full"/>
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium truncate ${activeChatId === chat.id ? 'text-blue-700' : 'text-gray-800'}`}>

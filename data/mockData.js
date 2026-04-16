@@ -42,7 +42,7 @@ export const chats = [
         lastMessagePreview: 'How do regulatory agencies impact phar...',
     },
     {
-        id: '8',
+        id: '7',
         name: 'Emma Chen',
         role: 'Oncology Nurse',
         avatar: 'https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
@@ -146,7 +146,7 @@ export const messagesByChat = {
             timestamp: '8:32 AM',
         },
     ],
-    '8': [
+    '7': [
         {
             id: 'm1',
             sender: 'user',

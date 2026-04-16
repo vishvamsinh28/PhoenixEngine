@@ -8,7 +8,6 @@ export default function ChatHeader({ chat }) {
             const target = e.target;
             target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.name)}&background=e0e7ff&color=3730a3&size=80`;
         }}/>
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-white rounded-full"/>
         </div>
         <div>
           <h3 className="font-semibold text-gray-900 text-sm">{chat.name}</h3>
