@@ -40,7 +40,7 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
         </div>
 
         <div className="pb-3 md:hidden">
-          <nav className="flex items-center gap-2 overflow-x-auto">
+          <nav className="no-scrollbar flex items-center gap-2 overflow-x-auto">
             {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
