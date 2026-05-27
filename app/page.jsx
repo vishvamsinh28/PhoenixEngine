@@ -13,6 +13,7 @@ import ConversationTools from '@/components/ConversationTools';
 import ProjectDashboard from '@/components/ProjectDashboard';
 import ThermalWorkbench from '@/components/ThermalWorkbench';
 import DomainWorkbench from '@/components/DomainWorkbench';
+import TutorialPage from '@/components/TutorialPage';
 import { usePhoenixChat } from '@/hooks/usePhoenixChat';
 
 function PhoenixWorkspace({ user, onLogout }) {
@@ -106,6 +107,11 @@ function PhoenixWorkspace({ user, onLogout }) {
                   onSelectProject={setActiveProjectId}
                   onOpenProject={() => setActiveView('workbench')}
                 />
+              </div>
+            )}
+            {activeView === 'tutorial' && (
+              <div className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))]">
+                <TutorialPage onOpenWorkbench={() => setActiveView('workbench')} />
               </div>
             )}
             {activeView === 'workbench' && (<>

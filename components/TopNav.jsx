@@ -1,8 +1,9 @@
 'use client';
-import { BarChart3, Cpu, Hexagon, LayoutDashboard, Menu } from 'lucide-react';
+import { BarChart3, BookOpen, Cpu, Hexagon, LayoutDashboard, Menu } from 'lucide-react';
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { id: 'tutorial', label: 'Tutorial', Icon: BookOpen },
   { id: 'workbench', label: 'Workbench', Icon: BarChart3 },
 ];
 
