@@ -77,10 +77,14 @@ export default function AuthPanel({ onAuthenticated }) {
             <h1 className="text-xl font-semibold text-[#edf3fb]">
               Phoenix Engine
             </h1>
-
-            <p className="text-xs text-[#8698b4]">
+            <a
+              href="https://www.linkedin.com/in/vishvamsinh-vaghela-591695217/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#8698b4] transition hover:text-[#9dc5ff]"
+            >
               Created by Vishvamsinh Vaghela
-            </p>
+            </a>
           </div>
         </div>
 
