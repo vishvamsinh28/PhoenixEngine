@@ -15,13 +15,13 @@ body {
 
 /* Optional: smooth fonts */
 body {
-  @apply bg-[#f6f8ff] text-[#1c2944];
+  @apply bg-[#0b1421] text-[#d9e2f1];
   min-height: 100vh;
   font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at 82% 12%, rgba(105, 172, 255, 0.16), transparent 33%),
-    radial-gradient(circle at 10% 100%, rgba(157, 128, 255, 0.12), transparent 32%),
-    linear-gradient(132deg, #fbfaff 0%, #f5f7ff 44%, #edf7ff 100%);
+    radial-gradient(circle at 83% 10%, rgba(45, 98, 176, 0.22), transparent 36%),
+    radial-gradient(circle at 8% 96%, rgba(67, 50, 124, 0.2), transparent 35%),
+    linear-gradient(132deg, #0b1421 0%, #101a2b 46%, #0c2230 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

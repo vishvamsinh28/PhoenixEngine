@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { Check, Copy } from 'lucide-react';
 
 const MarkdownResponse = dynamic(() => import('@/components/MarkdownResponse'), {
-    loading: () => <p className="text-[#7786a1]">Formatting result...</p>,
+    loading: () => <p className="text-[#91a2bc]">Formatting result...</p>,
 });
 
 export default function MessageBubble({ message }) {
@@ -40,7 +40,7 @@ export default function MessageBubble({ message }) {
     }
     return (<div className="py-3">
       <div className="max-w-[95%] md:max-w-[50rem]">
-        <div className="rounded-[20px] rounded-tl-[7px] border border-[#e7ecf6] bg-white px-4 py-4 text-[14px] leading-[1.6] text-[#344663] shadow-[0_8px_24px_rgba(35,55,96,0.05)] md:px-5 md:py-[18px]">
+        <div className="rounded-[20px] rounded-tl-[7px] border border-[#30435d]/80 bg-[#18263b]/94 px-4 py-4 text-[14px] leading-[1.6] text-[#ccd7e7] shadow-[0_12px_28px_rgba(0,0,0,0.17)] md:px-5 md:py-[18px]">
           {isStreamingAssistant ? (<div className="flex items-center gap-1.5 py-1 text-[#4f83f4]">
               <span className="h-2 w-2 animate-pulse rounded-full bg-current [animation-delay:-0.2s]"/>
               <span className="h-2 w-2 animate-pulse rounded-full bg-current [animation-delay:-0.1s]"/>
@@ -48,7 +48,7 @@ export default function MessageBubble({ message }) {
             </div>) : (<MarkdownResponse text={message.message}/>)}
         </div>
         {!isStreamingAssistant && (<div className="ml-1 mt-3 flex items-center gap-1.5">
-            <button title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} className={`rounded-lg p-1.5 transition-colors ${copied ? 'bg-[#edf3ff] text-[#3f6df2]' : 'text-[#8b9ab2] hover:bg-[#eff4ff] hover:text-[#4d648b]'}`}>
+            <button title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} className={`rounded-lg p-1.5 transition-colors ${copied ? 'bg-[#1d304b] text-[#68a1ff]' : 'text-[#7588a5] hover:bg-[#1b293e] hover:text-[#b1c1d7]'}`}>
               {copied ? <Check className="h-[14px] w-[14px]"/> : <Copy className="h-[14px] w-[14px]"/>}
             </button>
           </div>)}

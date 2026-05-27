@@ -41,22 +41,22 @@ export default function ConversationTools({ project, messages, query, onQueryCha
             setConfirming(false);
     };
 
-    return (<div className="flex flex-wrap items-center gap-2 border-b border-[#ecf0f8] bg-white/52 px-4 py-3 md:px-6">
-      <label className="flex min-w-[190px] flex-1 items-center gap-2 rounded-xl border border-[#e1e7f5] bg-white px-3 py-2 text-[#8293b0] shadow-sm md:max-w-xs">
+    return (<div className="flex flex-wrap items-center gap-2 bg-[#131f32]/48 px-4 py-3 md:px-6">
+      <label className="flex min-w-[190px] flex-1 items-center gap-2 rounded-xl bg-[#1b283c]/80 px-3 py-2 text-[#8193b0] shadow-[inset_0_1px_3px_rgba(0,0,0,0.15)] md:max-w-xs">
         <Search className="h-4 w-4"/>
         <input
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
           disabled={!hasMessages || disabled}
           placeholder="Search saved conversation"
-          className="w-full bg-transparent text-sm text-[#233452] outline-none placeholder:text-[#93a1ba] disabled:cursor-not-allowed"
+          className="w-full bg-transparent text-sm text-[#d3ddec] outline-none placeholder:text-[#6f819e] disabled:cursor-not-allowed"
         />
         {query && <button onClick={() => onQueryChange('')} title="Clear search"><X className="h-3.5 w-3.5"/></button>}
       </label>
       <button
         onClick={() => downloadConversation(project, messages)}
         disabled={!hasMessages || disabled}
-        className="flex items-center gap-2 rounded-xl border border-[#e1e7f5] bg-white px-3 py-2 text-sm text-[#526482] shadow-sm transition hover:bg-[#f5f8ff] disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex items-center gap-2 rounded-xl bg-[#1c293d]/78 px-3 py-2 text-sm text-[#bbc8db] shadow-[0_5px_14px_rgba(0,0,0,0.12)] transition hover:bg-[#223249] disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Download className="h-4 w-4"/>
         Export
@@ -64,14 +64,14 @@ export default function ConversationTools({ project, messages, query, onQueryCha
       {!confirming ? (<button
           onClick={() => setConfirming(true)}
           disabled={!hasMessages || disabled}
-          className="flex items-center gap-2 rounded-xl border border-[#f1dce2] bg-white px-3 py-2 text-sm text-[#b25e70] shadow-sm transition hover:bg-[#fff5f7] disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex items-center gap-2 rounded-xl bg-[#302332]/76 px-3 py-2 text-sm text-[#e39cab] shadow-[0_5px_14px_rgba(0,0,0,0.13)] transition hover:bg-[#3b2938] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Trash2 className="h-4 w-4"/>
           Clear
-        </button>) : (<div className="flex items-center gap-2 rounded-xl border border-[#ffd3dc] bg-[#fff4f6] px-2 py-1.5 text-sm text-[#b34e62]">
+        </button>) : (<div className="flex items-center gap-2 rounded-xl bg-[#382332]/90 px-2 py-1.5 text-sm text-[#f0a4b5] shadow-sm">
           <span className="px-1">Delete this history?</span>
           <button onClick={clear} className="rounded-md bg-[#d5566e] px-2.5 py-1 text-white hover:bg-[#be445b]">Delete</button>
-          <button onClick={() => setConfirming(false)} className="rounded-md px-2 py-1 hover:bg-[#ffe8ed]">Cancel</button>
+          <button onClick={() => setConfirming(false)} className="rounded-md px-2 py-1 hover:bg-[#4a2e3c]">Cancel</button>
         </div>)}
     </div>);
 }
