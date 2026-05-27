@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { projects as initialProjects, emptyMessagesByProject } from '@/data/engineData';
-import { STREAM_STEP_MS, formatPreview } from '@/lib/chatUtils';
+import { STREAM_STEP_MS, toPlainTextPreview } from '@/lib/chatUtils';
 
 function updateMessage(messages, projectId, messageId, update) {
     return {
@@ -61,7 +61,7 @@ export function usePhoenixChat() {
         return {
             ...project,
             messageCount: projectMessages.length,
-            lastMessagePreview: lastMessage ? formatPreview(lastMessage.message.replace(/\*\*/g, '')) : 'Start an engineering analysis',
+            lastMessagePreview: lastMessage ? toPlainTextPreview(lastMessage.message) : 'Start an engineering analysis',
         };
     }), [messages, projects]);
 
