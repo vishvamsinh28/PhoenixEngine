@@ -31,11 +31,13 @@ Create an `.env` file locally:
 GEMINI_API=your_google_ai_api_key
 GEMINI_MODEL=gemini-3.1-flash-lite
 MONGO_DATABASE_URL=mongodb+srv://username:password@cluster/phoenix_engine
+SESSION_DAYS=365
 ```
 
 - `GEMINI_API` is read only in the server API route and is never sent to the browser.
 - `GEMINI_MODEL` chooses the Gemini model used for analysis generation.
 - `MONGO_DATABASE_URL` stores user accounts, expiring sessions, user-owned messages, and saved engineering screening runs through the official MongoDB Node.js driver.
+- `SESSION_DAYS` controls how long a login session stays valid before expiry. It defaults to 365 days, and users can still end the session immediately by signing out.
 - MongoDB and Gemini configuration are required for the authenticated analysis workflow.
 
 ## Run Locally

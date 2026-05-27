@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionUser } from '@/lib/auth';
+import { getSessionUser, serializeAuthenticatedUser } from '@/lib/auth';
 import { getPhoenixDatabase } from '@/lib/mongodb';
 
 export async function GET() {
@@ -9,5 +9,7 @@ export async function GET() {
     }
 
     const user = await getSessionUser(database);
-    return NextResponse.json({ user: user ? { name: user.name, email: user.email } : null });
+    return NextResponse.json({
+        user: user ? serializeAuthenticatedUser(user, user.sessionExpiresAt) : null,
+    });
 }

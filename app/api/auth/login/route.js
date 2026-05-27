@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createSession, normalizeEmail, setSessionCookie, verifyPassword } from '@/lib/auth';
+import { createSession, normalizeEmail, serializeAuthenticatedUser, setSessionCookie, verifyPassword } from '@/lib/auth';
 import { getPhoenixDatabase } from '@/lib/mongodb';
 
 export async function POST(request) {
@@ -18,7 +18,9 @@ export async function POST(request) {
     }
 
     const session = await createSession(database, user._id);
-    const response = NextResponse.json({ user: { name: user.name, email: user.email } });
+    const response = NextResponse.json({
+        user: serializeAuthenticatedUser(user, session.expiresAt),
+    });
     setSessionCookie(response, session.token, session.expiresAt);
     return response;
 }
