@@ -12,7 +12,7 @@ The product is designed for early iteration. Its AI responses are not a replacem
 - Gemini-powered server-side engineering responses
 - MongoDB conversation persistence
 - Markdown, table, and LaTeX equation rendering for technical responses
-- Saved conversation search, Markdown export, and per-domain history deletion
+- Saved conversation search, PDF export, and per-domain history deletion
 - Screening-result streaming UI with assumption and validation messaging
 - Functional copy-answer and sign-out actions
 - Stop-generating control with cancellation-aware answer handling
