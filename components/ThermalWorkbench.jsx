@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Calculator, ChevronDown, ChevronUp, MessageSquare, Trash2 } from 'lucide-react';
+import { AlertTriangle, Calculator, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import RunInsights from '@/components/RunInsights';
 
 const DEFAULT_INPUTS = {
     powerW: '75',
@@ -43,11 +44,43 @@ function formatDate(value) {
     }).format(new Date(value));
 }
 
+function getValidationNotes(inputs) {
+    const notes = [];
+    const power = Number(inputs.powerW);
+    const area = Number(inputs.effectiveAreaCm2);
+    const h = Number(inputs.heatTransferCoefficient);
+    const ambient = Number(inputs.ambientC);
+    const limit = Number(inputs.maxTemperatureC);
+
+    if (Number.isFinite(power) && Number.isFinite(area) && area > 0 && power / area > 5)
+        notes.push('Heat load per area is high; verify the effective cooling area and spreading assumption.');
+    if (Number.isFinite(h) && h < 10)
+        notes.push('Convection coefficient is very low; natural-convection or sealed-enclosure assumptions should be explicit.');
+    if (Number.isFinite(ambient) && Number.isFinite(limit) && limit <= ambient)
+        notes.push('Temperature limit is not above ambient, so the run will likely fail by definition.');
+    return notes;
+}
+
+const THERMAL_METRICS = [
+    { label: 'Predicted temp', read: (run) => `${run.outputs.predictedTemperatureC} C` },
+    { label: 'Thermal R', read: (run) => `${run.outputs.totalResistanceKW} K/W` },
+    { label: 'Temperature rise', read: (run) => `${run.outputs.temperatureRiseC} C` },
+    { label: 'Margin', read: (run) => `${run.outputs.marginC} C` },
+];
+
+const THERMAL_TRANSPARENCY = [
+    'Inputs are validated numerically before the deterministic screening model runs.',
+    'Temperature, resistance, and sweep values come from a resistance-network calculation, not from the AI chat model.',
+    'The AI chat is used only when you ask to discuss a saved run or interpret next steps.',
+    'Report export captures the exact saved inputs, outputs, assumptions, sweep, and transparency notes visible here.',
+];
+
 export default function ThermalWorkbench({ disabled, onDiscuss }) {
     const [isOpen, setIsOpen] = useState(true);
     const [inputs, setInputs] = useState(DEFAULT_INPUTS);
     const [runs, setRuns] = useState([]);
     const [selectedRunId, setSelectedRunId] = useState('');
+    const [compareRunId, setCompareRunId] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
     const [error, setError] = useState('');
@@ -55,6 +88,11 @@ export default function ThermalWorkbench({ disabled, onDiscuss }) {
         () => runs.find((run) => run.id === selectedRunId) || runs[0],
         [runs, selectedRunId],
     );
+    const compareRun = useMemo(
+        () => runs.find((run) => run.id === compareRunId),
+        [runs, compareRunId],
+    );
+    const validationNotes = useMemo(() => getValidationNotes(inputs), [inputs]);
 
     useEffect(() => {
         let mounted = true;
@@ -173,6 +211,17 @@ export default function ThermalWorkbench({ disabled, onDiscuss }) {
             </button>
             <p className="text-xs text-[#7185a3]">Steady-state resistance network, saved to this account.</p>
           </div>
+          {validationNotes.length > 0 && (
+            <div className="mt-4 rounded-xl border border-[#5a4620] bg-[#2b2416]/86 p-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#f5bd73]">
+                <AlertTriangle className="h-4 w-4" />
+                Input validation notes
+              </div>
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5 text-[#d9c39a]">
+                {validationNotes.map((note) => <li key={note}>{note}</li>)}
+              </ul>
+            </div>
+          )}
         </form>
 
         {error && <p className="mt-4 rounded-lg bg-[#38202d]/90 px-3 py-2 text-sm text-[#f3a8ba]">{error}</p>}
@@ -182,32 +231,36 @@ export default function ThermalWorkbench({ disabled, onDiscuss }) {
             <div className="rounded-xl bg-[#172438]/82 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#789ee8]">Latest result</h4>
-                <button type="button" disabled={disabled} onClick={() => onDiscuss(buildDiscussionPrompt(selectedRun))} className="flex items-center gap-1.5 rounded-lg bg-[#213550] px-3 py-1.5 text-xs text-[#aec8f3] hover:bg-[#28405f] disabled:opacity-50">
-                  <MessageSquare className="h-3.5 w-3.5"/>
-                  Discuss in chat
-                </button>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <div><p className="text-xs text-[#788ca9]">Predicted temp</p><p className="mt-1 text-lg font-semibold text-[#eaf0fa]">{selectedRun.outputs.predictedTemperatureC} C</p></div>
-                <div><p className="text-xs text-[#788ca9]">Thermal R</p><p className="mt-1 text-lg font-semibold text-[#eaf0fa]">{selectedRun.outputs.totalResistanceKW} K/W</p></div>
-                <div><p className="text-xs text-[#788ca9]">Temperature rise</p><p className="mt-1 text-lg font-semibold text-[#eaf0fa]">{selectedRun.outputs.temperatureRiseC} C</p></div>
-                <div><p className="text-xs text-[#788ca9]">Margin</p><p className={`mt-1 text-lg font-semibold ${marginColor}`}>{selectedRun.outputs.marginC} C</p></div>
+                {THERMAL_METRICS.map((metric) => (
+                  <div key={metric.label}><p className="text-xs text-[#788ca9]">{metric.label}</p><p className={`mt-1 text-lg font-semibold ${metric.label === 'Margin' ? marginColor : 'text-[#eaf0fa]'}`}>{metric.read(selectedRun)}</p></div>
+                ))}
               </div>
               <p className={`mt-3 text-xs font-medium ${marginColor}`}>{selectedRun.outputs.status}</p>
 
-              <h5 className="mt-5 text-xs font-semibold uppercase tracking-[0.13em] text-[#7186a4]">Convection sensitivity</h5>
-              <div className="mt-2 overflow-hidden rounded-lg bg-[#111b2c]">
-                {selectedRun.sweep.map((point) => (<div key={point.label} className="flex items-center justify-between px-3 py-2 text-xs text-[#b7c5d9] [&+&]:border-t [&+&]:border-[#21344e]">
-                    <span>{point.label} ({point.heatTransferCoefficient} W/m2K)</span>
-                    <span className="font-medium text-[#dee7f4]">{point.predictedTemperatureC} C</span>
-                  </div>))}
+              <div className="mt-5">
+                <RunInsights
+                  assumptions={selectedRun.assumptions}
+                  chart={{
+                    title: 'Convection sensitivity',
+                    points: (run) => run.sweep.map((point) => ({
+                      label: `${point.label} (${point.heatTransferCoefficient} W/m2K)`,
+                      value: point.predictedTemperatureC,
+                      display: `${point.predictedTemperatureC} C`,
+                    })),
+                  }}
+                  compareRun={compareRun}
+                  disabled={disabled}
+                  metrics={THERMAL_METRICS}
+                  onCompareRunChange={setCompareRunId}
+                  onDiscuss={() => onDiscuss(buildDiscussionPrompt(selectedRun))}
+                  run={selectedRun}
+                  runs={runs}
+                  title="Thermal Screening"
+                  transparency={THERMAL_TRANSPARENCY}
+                />
               </div>
-              <details className="mt-4 text-xs text-[#91a3bd]">
-                <summary className="cursor-pointer text-[#aab9d0]">Assumptions and limitations</summary>
-                <ul className="mt-2 list-disc space-y-1 pl-4">
-                  {selectedRun.assumptions.map((assumption) => <li key={assumption}>{assumption}</li>)}
-                </ul>
-              </details>
             </div>
 
             <aside className="rounded-xl bg-[#172438]/82 p-3">

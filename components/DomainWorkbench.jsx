@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp, Droplets, Layers3, MessageSquare, Trash2, Wind } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronUp, Droplets, Layers3, Trash2, Wind } from 'lucide-react';
+import RunInsights from '@/components/RunInsights';
 
 const WORKBENCHES = {
     'winglet-flow': {
@@ -32,6 +33,28 @@ const WORKBENCHES = {
         summary: (run) => `${run.outputs.dragN} N drag / ${run.outputs.dragMarginN} N margin`,
         margin: (run) => run.outputs.dragMarginN,
         warningThreshold: (run) => run.inputs.dragLimitN * 0.1,
+        validation: (inputs) => {
+            const notes = [];
+            if (Number(inputs.velocityMS) > 70)
+                notes.push('Velocity is high for this incompressible screening model; check Mach number before trusting margins.');
+            if (Number(inputs.dragCoefficient) === 0)
+                notes.push('Zero drag coefficient is only valid for an idealized placeholder or calibration check.');
+            return notes;
+        },
+        chart: {
+            title: 'Velocity sensitivity',
+            points: (run) => run.sweep.map((point) => ({
+                label: `${point.label} (${point.velocityMS} m/s)`,
+                value: point.dragN,
+                display: `${point.dragN} N`,
+            })),
+        },
+        transparency: [
+            'Drag and lift are deterministic force calculations from supplied coefficients.',
+            'Phoenix does not infer Cd or Cl from geometry in this workbench.',
+            'The AI chat is used only to interpret saved results and recommend validation work.',
+            'Report export includes the saved inputs, outputs, sweep, assumptions, and transparency notes.',
+        ],
         discussion: (run) => [
             'Interpret this saved external-flow force screening run and identify what CFD or wind-tunnel evidence is needed next.',
             `Inputs: velocity ${run.inputs.velocityMS} m/s; density ${run.inputs.densityKgM3} kg/m3; viscosity ${run.inputs.viscosityPaS} Pa s; reference area ${run.inputs.referenceAreaM2} m2; length scale ${run.inputs.characteristicLengthM} m; supplied Cd ${run.inputs.dragCoefficient}; supplied Cl ${run.inputs.liftCoefficient}.`,
@@ -70,6 +93,28 @@ const WORKBENCHES = {
         summary: (run) => `${run.outputs.coolantOutletC} C outlet / ${run.outputs.pressureDropKPa} kPa`,
         margin: (run) => run.outputs.marginC,
         warningThreshold: () => 3,
+        validation: (inputs) => {
+            const notes = [];
+            if (Number(inputs.parallelChannels) !== Math.round(Number(inputs.parallelChannels)))
+                notes.push('Parallel channel count must be a whole number.');
+            if (Number(inputs.flowRateLMin) > 20)
+                notes.push('High flow can produce large pressure drop; confirm pump capability and manifold losses separately.');
+            return notes;
+        },
+        chart: {
+            title: 'Flow-rate sensitivity',
+            points: (run) => run.sweep.map((point) => ({
+                label: `${point.label} (${point.flowRateLMin} L/min)`,
+                value: point.pressureDropKPa,
+                display: `${point.coolantOutletC} C / ${point.pressureDropKPa} kPa`,
+            })),
+        },
+        transparency: [
+            'Coolant outlet temperature and pressure drop come from deterministic energy-balance and Darcy-Weisbach calculations.',
+            'The reported temperature is bulk coolant outlet temperature, not cell maximum temperature.',
+            'The AI chat is used only when asked to interpret a saved run or recommend next validation.',
+            'Report export captures the exact saved inputs, outputs, sweep, assumptions, and transparency notes.',
+        ],
         discussion: (run) => [
             'Interpret this saved liquid cooling screening run and recommend the next cold-plate or flow-loop validation step.',
             `Inputs: heat load ${run.inputs.heatLoadW} W; flow ${run.inputs.flowRateLMin} L/min; inlet ${run.inputs.inletTemperatureC} C; outlet limit ${run.inputs.maxOutletTemperatureC} C; ${run.inputs.parallelChannels} channels of ${run.inputs.channelWidthMm} by ${run.inputs.channelHeightMm} mm and ${run.inputs.channelLengthM} m length.`,
@@ -104,6 +149,28 @@ const WORKBENCHES = {
         summary: (run) => `${run.outputs.meanThicknessNm} nm / ${run.outputs.nonuniformityPercent}% non-uniformity`,
         margin: (run) => run.outputs.nonuniformityMarginPercent,
         warningThreshold: () => 1,
+        validation: (inputs) => {
+            const notes = [];
+            if (Math.abs(Number(inputs.centerTemperatureC) - Number(inputs.edgeTemperatureC)) > 20)
+                notes.push('Large center-to-edge temperature deltas may exceed the useful range of this two-point model.');
+            if (Number(inputs.activationEnergyKJMol) === 0)
+                notes.push('Zero activation energy removes temperature sensitivity; use only for a deliberate control case.');
+            return notes;
+        },
+        chart: {
+            title: 'Edge temperature sensitivity',
+            points: (run) => run.sweep.map((point) => ({
+                label: `${point.label} (${point.edgeTemperatureC} C)`,
+                value: point.nonuniformityPercent,
+                display: `${point.nonuniformityPercent}%`,
+            })),
+        },
+        transparency: [
+            'Thickness and uniformity come from a deterministic Arrhenius screening model.',
+            'The model uses only center and edge conditions; it does not resolve full radial behavior.',
+            'The AI chat is used only to interpret saved runs and suggest process characterization steps.',
+            'Report export includes the exact saved inputs, outputs, sweep, assumptions, and transparency notes.',
+        ],
         discussion: (run) => [
             'Interpret this saved deposition uniformity screening run and recommend the next process characterization step.',
             `Inputs: center rate ${run.inputs.centerRateNmMin} nm/min at ${run.inputs.centerTemperatureC} C; edge temperature ${run.inputs.edgeTemperatureC} C; activation energy ${run.inputs.activationEnergyKJMol} kJ/mol; duration ${run.inputs.processTimeMin} min; target ${run.inputs.targetThicknessNm} nm; maximum non-uniformity ${run.inputs.maxNonuniformityPercent}%.`,
@@ -129,10 +196,13 @@ export default function DomainWorkbench({ projectId, disabled, onDiscuss }) {
     const [inputs, setInputs] = useState(initialInputs);
     const [runs, setRuns] = useState([]);
     const [selectedRunId, setSelectedRunId] = useState('');
+    const [compareRunId, setCompareRunId] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
     const [error, setError] = useState('');
     const selectedRun = useMemo(() => runs.find((run) => run.id === selectedRunId) || runs[0], [runs, selectedRunId]);
+    const compareRun = useMemo(() => runs.find((run) => run.id === compareRunId), [runs, compareRunId]);
+    const validationNotes = useMemo(() => config.validation(inputs), [config, inputs]);
 
     useEffect(() => {
         let mounted = true;
@@ -238,6 +308,15 @@ export default function DomainWorkbench({ projectId, disabled, onDiscuss }) {
             </button>
             <p className="text-xs text-[#7185a3]">{config.footer}</p>
           </div>
+          {validationNotes.length > 0 && (<div className="mt-4 rounded-xl border border-[#5a4620] bg-[#2b2416]/86 p-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#f5bd73]">
+                <AlertTriangle className="h-4 w-4"/>
+                Input validation notes
+              </div>
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5 text-[#d9c39a]">
+                {validationNotes.map((note) => <li key={note}>{note}</li>)}
+              </ul>
+            </div>)}
         </form>
 
         {error && <p className="mt-4 rounded-lg bg-[#38202d]/90 px-3 py-2 text-sm text-[#f3a8ba]">{error}</p>}
@@ -246,24 +325,26 @@ export default function DomainWorkbench({ projectId, disabled, onDiscuss }) {
             <div className="rounded-xl bg-[#172438]/82 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#789ee8]">Latest result</h4>
-                <button type="button" disabled={disabled} onClick={() => onDiscuss(config.discussion(selectedRun))} className="flex items-center gap-1.5 rounded-lg bg-[#213550] px-3 py-1.5 text-xs text-[#aec8f3] hover:bg-[#28405f] disabled:opacity-50">
-                  <MessageSquare className="h-3.5 w-3.5"/>Discuss in chat
-                </button>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {config.metrics.map((metric) => <div key={metric.label}><p className="text-xs text-[#788ca9]">{metric.label}</p><p className="mt-1 text-lg font-semibold text-[#eaf0fa]">{metric.read(selectedRun)}</p></div>)}
               </div>
               <p className={`mt-3 text-xs font-medium ${marginColor}`}>{selectedRun.outputs.status}</p>
-              <h5 className="mt-5 text-xs font-semibold uppercase tracking-[0.13em] text-[#7186a4]">{config.sweepTitle}</h5>
-              <div className="mt-2 overflow-hidden rounded-lg bg-[#111b2c]">
-                {selectedRun.sweep.map((point) => (<div key={point.label} className="flex items-center justify-between gap-3 px-3 py-2 text-xs text-[#b7c5d9] [&+&]:border-t [&+&]:border-[#21344e]">
-                    <span>{config.sweepRow(point)}</span><span className="font-medium text-[#dee7f4]">{config.sweepResult(point)}</span>
-                  </div>))}
+              <div className="mt-5">
+                <RunInsights
+                  assumptions={selectedRun.assumptions}
+                  chart={config.chart}
+                  compareRun={compareRun}
+                  disabled={disabled}
+                  metrics={config.metrics}
+                  onCompareRunChange={setCompareRunId}
+                  onDiscuss={() => onDiscuss(config.discussion(selectedRun))}
+                  run={selectedRun}
+                  runs={runs}
+                  title={config.title}
+                  transparency={config.transparency}
+                />
               </div>
-              <details className="mt-4 text-xs text-[#91a3bd]">
-                <summary className="cursor-pointer text-[#aab9d0]">Assumptions and limitations</summary>
-                <ul className="mt-2 list-disc space-y-1 pl-4">{selectedRun.assumptions.map((assumption) => <li key={assumption}>{assumption}</li>)}</ul>
-              </details>
             </div>
             <aside className="rounded-xl bg-[#172438]/82 p-3">
               <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#789ee8]">Saved runs</h4>

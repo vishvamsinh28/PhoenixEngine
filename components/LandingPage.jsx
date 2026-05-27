@@ -86,7 +86,7 @@ export default function LandingPage({ onGetStarted }) {
             A focused workspace for engineering screening runs, saved technical conversations, and AI-assisted interpretation across thermal, flow, battery, and process modeling problems.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
               onClick={onGetStarted}
@@ -100,6 +100,12 @@ export default function LandingPage({ onGetStarted }) {
               className="inline-flex items-center justify-center rounded-xl border border-[#324a69] bg-[#111d2e]/72 px-5 py-3 text-sm font-semibold text-[#d8e4f4] transition hover:border-[#52759d] hover:bg-[#17263a]"
             >
               Explore capabilities
+            </a>
+            <a
+              href="#method"
+              className="inline-flex items-center justify-center rounded-xl border border-[#324a69] bg-[#111d2e]/72 px-5 py-3 text-sm font-semibold text-[#d8e4f4] transition hover:border-[#52759d] hover:bg-[#17263a]"
+            >
+              How it works
             </a>
           </div>
 
@@ -191,6 +197,32 @@ export default function LandingPage({ onGetStarted }) {
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="mt-5 text-base font-semibold text-[#edf3fb]">{name}</h3>
+                <p className="mt-2 text-sm leading-6 text-[#9aacc5]">{detail}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="method" className="border-t border-[#263a55]/80 bg-[#101a2b]/82 px-5 py-14 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8fb7ff]">Method and trust</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#edf3fb]">Built to separate calculations from interpretation</h2>
+            <p className="mt-4 text-sm leading-7 text-[#9aacc5]">
+              Phoenix runs deterministic screening models first, then uses AI to help explain the result, challenge assumptions, and plan the next validation step.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              ['Validated inputs', 'Each workbench checks numeric ranges and flags suspicious operating conditions before a run is saved.'],
+              ['Saved evidence', 'Runs, assumptions, sensitivity sweeps, and conversations stay attached to your account.'],
+              ['Report export', 'Engineering notes can be exported with inputs, outputs, assumptions, and transparency details.'],
+              ['Known limits', 'Every model exposes what it does and does not calculate, so results stay in context.'],
+            ].map(([title, detail]) => (
+              <article key={title} className="rounded-[18px] border border-[#263a55] bg-[#121e31]/82 p-5 shadow-[0_16px_34px_rgba(0,0,0,0.16)]">
+                <h3 className="text-base font-semibold text-[#edf3fb]">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-[#9aacc5]">{detail}</p>
               </article>
             ))}
