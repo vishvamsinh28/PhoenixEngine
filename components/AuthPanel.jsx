@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, Cpu, Hexagon } from 'lucide-react';
+import { ArrowLeft, Cpu, Eye, EyeOff, Hexagon } from 'lucide-react';
 
 export default function AuthPanel({ onAuthenticated, onBack }) {
   const [mode, setMode] = useState('login');
@@ -13,6 +13,7 @@ export default function AuthPanel({ onAuthenticated, onBack }) {
 
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const updateField = (event) => {
     setForm((previous) => ({
@@ -62,6 +63,8 @@ export default function AuthPanel({ onAuthenticated, onBack }) {
 
   const inputStyles =
     'mt-2 block w-full rounded-xl border border-[#2b3b55] bg-[#1a2436] px-4 py-3 text-[#e0e8f5] placeholder:text-[#6f819d] shadow-[inset_0_1px_3px_rgba(0,0,0,0.18)] outline-none transition duration-200 focus:border-[#4e7eeb] focus:bg-[#223249] focus:ring-4 focus:ring-[#4e7eeb]/20';
+  const passwordInputStyles =
+    `${inputStyles} pr-12`;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_78%_16%,rgba(48,98,185,0.24),transparent_34%),radial-gradient(circle_at_12%_85%,rgba(70,54,133,0.20),transparent_32%),linear-gradient(132deg,#0b1421,#101a2b_52%,#0b2230)] p-5">
@@ -141,16 +144,31 @@ export default function AuthPanel({ onAuthenticated, onBack }) {
           <label className="block text-sm text-[#b1bfd3]">
             Password
 
-            <input
-              required
-              minLength={8}
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={updateField}
-              placeholder="Enter your password"
-              className={inputStyles}
-            />
+            <div className="relative">
+              <input
+                required
+                minLength={8}
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={form.password}
+                onChange={updateField}
+                placeholder="Enter your password"
+                className={passwordInputStyles}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-[#8fa1bb] transition hover:bg-[#263850] hover:text-[#dce8f8] focus:outline-none focus:ring-2 focus:ring-[#4e7eeb]/60"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </label>
 
           {error && (
