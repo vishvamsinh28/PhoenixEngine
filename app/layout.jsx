@@ -1,4 +1,5 @@
 import './globals.css';
+import 'katex/dist/katex.min.css';
 export const metadata = {
     title: 'Phoenix Engine | Physics Intelligence',
     description: 'Physics-informed engineering analysis for rapid R&D iteration.',

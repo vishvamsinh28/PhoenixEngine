@@ -21,6 +21,7 @@ export function usePhoenixChat() {
     const [isStreaming, setIsStreaming] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const streamIntervalRef = useRef(null);
 
     useEffect(() => {
@@ -59,12 +60,21 @@ export function usePhoenixChat() {
         const lastMessage = projectMessages[projectMessages.length - 1];
         return {
             ...project,
+            messageCount: projectMessages.length,
             lastMessagePreview: lastMessage ? formatPreview(lastMessage.message.replace(/\*\*/g, '')) : 'Start an engineering analysis',
         };
     }), [messages, projects]);
 
     const activeProject = projectList.find((project) => project.id === activeProjectId) ?? projectList[0];
     const currentMessages = messages[activeProjectId] || [];
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const visibleMessages = normalizedQuery
+        ? currentMessages.filter((message) => message.message.toLowerCase().includes(normalizedQuery))
+        : currentMessages;
+
+    useEffect(() => {
+        setSearchQuery('');
+    }, [activeProjectId]);
 
     const streamAssistantMessage = (projectId, assistantMessageId, answer) => new Promise((resolve) => {
         const chunks = answer.split(/(\s+)/);
@@ -92,6 +102,7 @@ export function usePhoenixChat() {
 
         setIsStreaming(true);
         setError('');
+        setSearchQuery('');
         setMessages((previous) => ({
             ...previous,
             [projectId]: [...(previous[projectId] || []), userMessage, { id: assistantMessageId, sender: 'assistant', message: '' }],
@@ -122,17 +133,46 @@ export function usePhoenixChat() {
         }
     };
 
+    const clearConversation = async () => {
+        if (isStreaming || !activeProject)
+            return false;
+
+        setError('');
+        try {
+            const response = await fetch('/api/conversations', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ projectId: activeProject.id }),
+            });
+            const payload = await response.json();
+            if (!response.ok)
+                throw new Error(payload.error || 'Unable to clear conversation history.');
+
+            setMessages((previous) => ({ ...previous, [activeProject.id]: [] }));
+            setSearchQuery('');
+            return true;
+        }
+        catch (failure) {
+            setError(failure.message || 'Unable to clear conversation history.');
+            return false;
+        }
+    };
+
     return {
         activeProject,
         activeProjectId,
+        clearConversation,
         currentMessages,
         error,
         isLoading,
         isStreaming,
         projectList,
+        searchQuery,
         sendMessage,
+        setSearchQuery,
         setActiveProjectId,
         setSidebarOpen,
         sidebarOpen,
+        visibleMessages,
     };
 }

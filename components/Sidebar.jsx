@@ -17,7 +17,7 @@ export default function Sidebar({ projects, activeProjectId, onSelectProject, is
         `}>
         <div className="flex items-center justify-between px-5 pb-5 pt-5 md:pt-7">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#567382]">Saved chats</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#567382]">Analysis domains</p>
             <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-white">Domains</h2>
           </div>
           <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { projects, emptyMessagesByProject } from '@/data/engineData';
+import { projectById, projects, emptyMessagesByProject } from '@/data/engineData';
 import { getSessionUser } from '@/lib/auth';
 import { getPhoenixDatabase } from '@/lib/mongodb';
 
@@ -29,5 +29,36 @@ export async function GET() {
     catch (error) {
         console.error('Unable to load Phoenix Engine projects:', error);
         return NextResponse.json({ error: 'Unable to load conversations.' }, { status: 500 });
+    }
+}
+
+export async function DELETE(request) {
+    try {
+        const database = await getPhoenixDatabase();
+        if (!database) {
+            return NextResponse.json({ error: 'MongoDB is required to manage conversations.' }, { status: 503 });
+        }
+
+        const user = await getSessionUser(database);
+        if (!user) {
+            return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+        }
+
+        const body = await request.json();
+        const project = projectById(body.projectId);
+        if (!project) {
+            return NextResponse.json({ error: 'A valid analysis domain is required.' }, { status: 400 });
+        }
+
+        const result = await database.collection('messages').deleteMany({
+            userId: user._id,
+            projectId: project.id,
+        });
+
+        return NextResponse.json({ deletedCount: result.deletedCount });
+    }
+    catch (error) {
+        console.error('Unable to clear Phoenix Engine conversation:', error);
+        return NextResponse.json({ error: 'Unable to clear conversation history.' }, { status: 500 });
     }
 }

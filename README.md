@@ -11,8 +11,10 @@ The product is designed for early iteration. Its AI responses are not a replacem
 - Analysis domains for electronics thermal, aerodynamics, battery cooling, and semiconductor processing
 - Gemini-powered server-side engineering responses
 - MongoDB conversation persistence
+- Markdown, table, and LaTeX equation rendering for technical responses
+- Saved conversation search, Markdown export, and per-domain history deletion
 - Screening-result streaming UI with assumption and validation messaging
-- Functional copy-answer and sign-out actions only; unimplemented controls are not shown
+- Functional copy-answer and sign-out actions
 
 ## Configuration
 

@@ -1,22 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Check, Copy } from 'lucide-react';
 
-function renderInline(text) {
-    return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => part.startsWith('**') && part.endsWith('**')
-        ? <strong key={index} className="font-semibold text-[#eaf4f7]">{part.slice(2, -2)}</strong>
-        : part);
-}
-
-function FormattedResponse({ text }) {
-    return text.split('\n').map((line, index) => {
-        if (!line)
-            return <div key={index} className="h-3"/>;
-        if (line.startsWith('- '))
-            return <p key={index} className="mt-1 pl-3 text-[#afc4ce] before:mr-2 before:text-[#1db7e8] before:content-['-']">{renderInline(line.slice(2))}</p>;
-        return <p key={index} className={index === 0 ? '' : 'mt-1'}>{renderInline(line)}</p>;
-    });
-}
+const MarkdownResponse = dynamic(() => import('@/components/MarkdownResponse'), {
+    loading: () => <p className="text-[#78929e]">Formatting result...</p>,
+});
 
 export default function MessageBubble({ message }) {
     const isUser = message.sender === 'user';
@@ -56,7 +45,7 @@ export default function MessageBubble({ message }) {
               <span className="h-2 w-2 animate-pulse rounded-full bg-current [animation-delay:-0.2s]"/>
               <span className="h-2 w-2 animate-pulse rounded-full bg-current [animation-delay:-0.1s]"/>
               <span className="h-2 w-2 animate-pulse rounded-full bg-current"/>
-            </div>) : (<FormattedResponse text={message.message}/>)}
+            </div>) : (<MarkdownResponse text={message.message}/>)}
         </div>
         {!isStreamingAssistant && (<div className="ml-1 mt-3 flex items-center gap-1.5">
             <button title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} className={`rounded-lg p-1.5 transition-colors ${copied ? 'bg-[#123442] text-[#22b7e8]' : 'text-[#63808d] hover:bg-[#112631] hover:text-[#bdd1d8]'}`}>
