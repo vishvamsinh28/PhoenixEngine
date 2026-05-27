@@ -6,15 +6,13 @@ The product is designed for early iteration. Its AI responses are not a replacem
 
 ## Features
 
-- Engineering Copilot with project-specific analysis threads
-- Seed projects across electronics thermal, aerodynamics, battery cooling, and semiconductor processing
+- Email/password accounts with HTTP-only, MongoDB-backed sessions
+- Account-owned saved conversation history by engineering domain
+- Analysis domains for electronics thermal, aerodynamics, battery cooling, and semiconductor processing
 - Gemini-powered server-side engineering responses
-- MongoDB conversation persistence when configured
-- CAD/data asset selection for STEP, IGES, STL, CSV, JSON, VTK, and OBJ inputs
+- MongoDB conversation persistence
 - Screening-result streaming UI with assumption and validation messaging
-- Overview, model library, and dataset workspace surfaces
-
-Asset files are currently represented in prompt context by filename only. Binary CAD parsing and solver ingestion are the next integration stage.
+- Functional copy-answer and sign-out actions only; unimplemented controls are not shown
 
 ## Configuration
 
@@ -28,8 +26,8 @@ MONGO_DATABASE_URL=mongodb+srv://username:password@cluster/phoenix_engine
 
 - `GEMINI_API` is read only in the server API route and is never sent to the browser.
 - `GEMINI_MODEL` chooses the Gemini model used for analysis generation.
-- `MONGO_DATABASE_URL` enables persisted thread messages through the official MongoDB Node.js driver.
-- Without configuration, the UI remains usable with seeded projects and clearly marked fallback responses.
+- `MONGO_DATABASE_URL` stores user accounts, expiring sessions, and user-owned messages through the official MongoDB Node.js driver.
+- MongoDB and Gemini configuration are required for the authenticated analysis workflow.
 
 ## Run Locally
 
@@ -52,8 +50,10 @@ npm run start
 
 - `app/page.jsx`: Phoenix Engine workspace shell
 - `app/api/chat/route.js`: Gemini-backed engineering response endpoint
-- `app/api/conversations/route.js`: stored or seeded conversation loader
+- `app/api/conversations/route.js`: authenticated saved-conversation loader
+- `app/api/auth/*`: account and session endpoints
 - `hooks/usePhoenixChat.js`: browser conversation and streamed-display state
-- `data/engineData.js`: starter engineering projects
+- `data/engineData.js`: available engineering analysis domains
+- `lib/auth.js`: password hashing and database-backed sessions
 - `lib/gemini.js`: server-only Gemini REST integration
 - `lib/mongodb.js`: MongoDB connection reuse and persistence setup

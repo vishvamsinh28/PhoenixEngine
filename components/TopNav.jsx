@@ -1,9 +1,7 @@
 'use client';
 import { Menu, Hexagon, Cpu } from 'lucide-react';
-import { NAV_TABS } from '@/data/uiConfig';
-import NavTabButton from '@/components/NavTabButton';
 
-export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
+export default function TopNav({ user, onMenuToggle, onLogout }) {
     return (<header className="fixed left-0 right-0 top-0 z-50 border-b border-[#122630] bg-[#061117]/92 backdrop-blur-xl">
       <div className="px-4 md:px-5">
         <div className="relative flex h-[72px] items-center justify-between gap-3">
@@ -21,21 +19,12 @@ export default function TopNav({ activeTab, onTabChange, onMenuToggle }) {
             </div>
           </div>
 
-          <div className="hidden md:absolute md:left-1/2 md:flex md:-translate-x-1/2">
-            <nav className="flex items-center gap-1 rounded-full border border-[#19313c] bg-[#0b1921] p-[5px]">
-              {NAV_TABS.map((tab) => (<NavTabButton key={tab.id} tab={tab} isActive={activeTab === tab.id} onSelect={onTabChange}/>))}
-            </nav>
+          <div className="flex items-center gap-3">
+            <p className="hidden text-sm text-[#9eb2bb] sm:block">{user.name}</p>
+            <button onClick={onLogout} className="rounded-lg border border-[#1d3743] bg-[#0b1c25] px-3 py-2 text-sm text-[#c1d1d8] hover:bg-[#112a35]">
+              Sign out
+            </button>
           </div>
-
-          <div className="hidden items-center rounded-full border border-[#183846] bg-[#0b2029] px-3 py-2 text-xs text-[#69d7ff] md:flex">
-            Solver beta
-          </div>
-        </div>
-
-        <div className="pb-4 md:hidden">
-          <nav className="no-scrollbar flex items-center gap-2 overflow-x-auto">
-            {NAV_TABS.map((tab) => (<NavTabButton key={tab.id} tab={tab} isActive={activeTab === tab.id} onSelect={onTabChange} mobile/>))}
-          </nav>
         </div>
       </div>
     </header>);

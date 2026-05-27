@@ -1,8 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
-import { MESSAGE_ACTIONS } from '@/data/uiConfig';
-import IconActionButton from '@/components/IconActionButton';
 
 function renderInline(text) {
     return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => part.startsWith('**') && part.endsWith('**')
@@ -61,8 +59,9 @@ export default function MessageBubble({ message }) {
             </div>) : (<FormattedResponse text={message.message}/>)}
         </div>
         {!isStreamingAssistant && (<div className="ml-1 mt-3 flex items-center gap-1.5">
-            <IconActionButton icon={copied ? Check : Copy} title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} active={copied} buttonClassName="p-1.5"/>
-            {MESSAGE_ACTIONS.map((action) => (<IconActionButton key={action.title} icon={action.icon} title={action.title} buttonClassName="p-1.5"/>))}
+            <button title={copied ? 'Copied' : 'Copy'} onClick={handleCopy} className={`rounded-lg p-1.5 transition-colors ${copied ? 'bg-[#123442] text-[#22b7e8]' : 'text-[#63808d] hover:bg-[#112631] hover:text-[#bdd1d8]'}`}>
+              {copied ? <Check className="h-[14px] w-[14px]"/> : <Copy className="h-[14px] w-[14px]"/>}
+            </button>
           </div>)}
       </div>
     </div>);

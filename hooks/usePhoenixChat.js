@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { projects as initialProjects, messagesByProject as initialMessages } from '@/data/engineData';
+import { projects as initialProjects, emptyMessagesByProject } from '@/data/engineData';
 import { STREAM_STEP_MS, formatPreview } from '@/lib/chatUtils';
 
 function updateMessage(messages, projectId, messageId, update) {
@@ -17,26 +17,34 @@ export function usePhoenixChat() {
     const [activeProjectId, setActiveProjectId] = useState(initialProjects[0]?.id ?? '');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [projects, setProjects] = useState(initialProjects);
-    const [messages, setMessages] = useState(initialMessages);
+    const [messages, setMessages] = useState(emptyMessagesByProject);
     const [isStreaming, setIsStreaming] = useState(false);
-    const [runtime, setRuntime] = useState('Connecting');
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
     const streamIntervalRef = useRef(null);
 
     useEffect(() => {
         let isMounted = true;
 
         fetch('/api/conversations')
-            .then((response) => response.json())
+            .then(async (response) => {
+                const payload = await response.json();
+                if (!response.ok)
+                    throw new Error(payload.error || 'Unable to load saved conversations.');
+                return payload;
+            })
             .then((payload) => {
                 if (!isMounted)
                     return;
                 setProjects(payload.projects || initialProjects);
-                setMessages(payload.messagesByProject || initialMessages);
-                setRuntime(payload.persistence === 'mongodb' ? 'MongoDB connected' : 'Demo dataset');
+                setMessages(payload.messagesByProject || emptyMessagesByProject);
+                setIsLoading(false);
             })
-            .catch(() => {
-                if (isMounted)
-                    setRuntime('Demo dataset');
+            .catch((failure) => {
+                if (isMounted) {
+                    setError(failure.message);
+                    setIsLoading(false);
+                }
             });
 
         return () => {
@@ -74,16 +82,16 @@ export function usePhoenixChat() {
         }, STREAM_STEP_MS);
     });
 
-    const sendMessage = async (text, attachments = []) => {
+    const sendMessage = async (text) => {
         if (isStreaming || !activeProject)
             return;
 
         const projectId = activeProject.id;
-        const userMessage = { id: `user-${Date.now()}`, sender: 'user', message: text, attachments };
+        const userMessage = { id: `user-${Date.now()}`, sender: 'user', message: text };
         const assistantMessageId = `assistant-pending-${Date.now()}`;
-        const history = messages[projectId] || [];
 
         setIsStreaming(true);
+        setError('');
         setMessages((previous) => ({
             ...previous,
             [projectId]: [...(previous[projectId] || []), userMessage, { id: assistantMessageId, sender: 'assistant', message: '' }],
@@ -93,19 +101,21 @@ export function usePhoenixChat() {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ projectId, message: text, attachments, history }),
+                body: JSON.stringify({ projectId, message: text }),
             });
             const payload = await response.json();
 
             if (!response.ok)
                 throw new Error(payload.error || 'Analysis request failed.');
 
-            setRuntime(payload.persisted ? `Gemini ${payload.source === 'gemini' ? '+ MongoDB' : '+ MongoDB fallback'}` : payload.source === 'gemini' ? 'Gemini live' : 'Demo dataset');
             await streamAssistantMessage(projectId, assistantMessageId, payload.message.message);
         }
-        catch {
-            const failure = '**Run unavailable**\n\nThe analysis request could not be completed. Verify the server configuration and try this run again.';
-            await streamAssistantMessage(projectId, assistantMessageId, failure);
+        catch (failure) {
+            setMessages((previous) => ({
+                ...previous,
+                [projectId]: (previous[projectId] || []).filter((message) => message.id !== userMessage.id && message.id !== assistantMessageId),
+            }));
+            setError(failure.message || 'Analysis request failed.');
         }
         finally {
             setIsStreaming(false);
@@ -116,9 +126,10 @@ export function usePhoenixChat() {
         activeProject,
         activeProjectId,
         currentMessages,
+        error,
+        isLoading,
         isStreaming,
         projectList,
-        runtime,
         sendMessage,
         setActiveProjectId,
         setSidebarOpen,

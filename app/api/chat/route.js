@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { projectById } from '@/data/engineData';
-import { generateFallbackAnswer } from '@/lib/fallbackEngine';
+import { getSessionUser } from '@/lib/auth';
 import { generateEngineeringAnswer } from '@/lib/gemini';
 import { getPhoenixDatabase } from '@/lib/mongodb';
 
@@ -8,42 +8,47 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
     try {
+        const database = await getPhoenixDatabase();
+        if (!database) {
+            return NextResponse.json({ error: 'MongoDB is required to save analysis conversations.' }, { status: 503 });
+        }
+
+        const user = await getSessionUser(database);
+        if (!user) {
+            return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+        }
+
         const body = await request.json();
         const project = projectById(body.projectId);
         const message = typeof body.message === 'string' ? body.message.trim() : '';
-        const history = Array.isArray(body.history) ? body.history.slice(-10) : [];
-        const attachments = Array.isArray(body.attachments) ? body.attachments.slice(0, 5) : [];
 
         if (!project || !message) {
             return NextResponse.json({ error: 'A valid project and engineering question are required.' }, { status: 400 });
         }
 
+        const storedHistory = await database.collection('messages')
+            .find({ userId: user._id, projectId: project.id })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .toArray();
+        const history = storedHistory.reverse().map((storedMessage) => ({
+            sender: storedMessage.sender,
+            message: storedMessage.message,
+        }));
         const userMessage = {
             id: `user-${Date.now()}`,
             sender: 'user',
             message,
             projectId: project.id,
-            attachments,
+            userId: user._id,
             createdAt: new Date(),
         };
-        let assistantText;
-        let source = 'gemini';
-
-        try {
-            assistantText = await generateEngineeringAnswer({
+        const assistantText = await generateEngineeringAnswer({
                 project,
                 messages: [...history, userMessage],
-                attachments,
             });
-        }
-        catch (error) {
-            console.error('Gemini response failed:', error);
-            assistantText = null;
-        }
-
         if (!assistantText) {
-            source = 'demo';
-            assistantText = generateFallbackAnswer({ project, message, attachments });
+            return NextResponse.json({ error: 'Gemini is not configured for analysis.' }, { status: 503 });
         }
 
         const assistantMessage = {
@@ -51,21 +56,14 @@ export async function POST(request) {
             sender: 'assistant',
             message: assistantText,
             projectId: project.id,
+            userId: user._id,
             createdAt: new Date(),
         };
-        const database = await getPhoenixDatabase().catch((error) => {
-            console.error('MongoDB persistence unavailable:', error);
-            return null;
-        });
-
-        if (database) {
-            await database.collection('messages').insertMany([userMessage, assistantMessage]);
-        }
+        await database.collection('messages').insertMany([userMessage, assistantMessage]);
 
         return NextResponse.json({
             message: { id: assistantMessage.id, sender: assistantMessage.sender, message: assistantMessage.message },
-            source,
-            persisted: Boolean(database),
+            persisted: true,
         });
     }
     catch (error) {
