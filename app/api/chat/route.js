@@ -46,9 +46,9 @@ export async function POST(request) {
         const assistantText = await generateEngineeringAnswer({
                 project,
                 messages: [...history, userMessage],
-            });
+        });
         if (!assistantText) {
-            return NextResponse.json({ error: 'Gemini is not configured for analysis.' }, { status: 503 });
+            return NextResponse.json({ error: 'The analysis engine is not configured.' }, { status: 503 });
         }
 
         const assistantMessage = {

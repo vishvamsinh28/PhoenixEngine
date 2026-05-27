@@ -1,6 +1,6 @@
 # Phoenix Engine
 
-Phoenix Engine is a physics-informed engineering copilot for rapid R&D screening. It helps teams frame simulation studies, reason about thermal, aerodynamic, battery, materials, and manufacturing problems, and turn engineering questions into fast preliminary analysis.
+Phoenix Engine is a physics-informed engineering copilot created by Vishvamsinh Vaghela for rapid R&D screening. It helps teams frame simulation studies, reason about thermal, aerodynamic, battery, materials, and manufacturing problems, and turn engineering questions into fast preliminary analysis.
 
 The product is designed for early iteration. Its AI responses are not a replacement for validated CFD, FEA, process simulation, or physical testing.
 

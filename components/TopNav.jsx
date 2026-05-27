@@ -15,7 +15,7 @@ export default function TopNav({ user, onMenuToggle, onLogout }) {
             </div>
             <div>
               <p className="text-base font-semibold tracking-[-0.03em] text-white">Phoenix Engine</p>
-              <p className="hidden text-[10px] font-medium uppercase tracking-[0.16em] text-[#607d8a] sm:block">Physics intelligence platform</p>
+              <p className="hidden text-[10px] font-medium uppercase tracking-[0.16em] text-[#607d8a] sm:block">Created by Vishvamsinh Vaghela</p>
             </div>
           </div>
 

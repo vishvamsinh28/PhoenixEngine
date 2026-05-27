@@ -51,7 +51,7 @@ export default function AuthPanel({ onAuthenticated }) {
           </div>
           <div>
             <h1 className="text-xl font-semibold text-white">Phoenix Engine</h1>
-            <p className="text-xs text-[#78929e]">Physics-informed analysis workspace</p>
+            <p className="text-xs text-[#78929e]">Created by Vishvamsinh Vaghela</p>
           </div>
         </div>
         <h2 className="mt-9 text-2xl font-semibold tracking-[-0.03em] text-white">{mode === 'login' ? 'Sign in' : 'Create account'}</h2>
