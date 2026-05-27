@@ -7,6 +7,7 @@ import ChatHeader from '@/components/ChatHeader';
 import MessageBubble from '@/components/MessageBubble';
 import ChatInput from '@/components/ChatInput';
 import AuthPanel from '@/components/AuthPanel';
+import LandingPage from '@/components/LandingPage';
 import ConversationTools from '@/components/ConversationTools';
 import ThermalWorkbench from '@/components/ThermalWorkbench';
 import DomainWorkbench from '@/components/DomainWorkbench';
@@ -76,6 +77,7 @@ function PhoenixWorkspace({ user, onLogout }) {
 
 export default function Home() {
     const [user, setUser] = useState(undefined);
+    const [showAuth, setShowAuth] = useState(false);
 
     useEffect(() => {
         fetch('/api/auth/session')
@@ -94,7 +96,11 @@ export default function Home() {
     }
 
     if (!user) {
-        return <AuthPanel onAuthenticated={setUser}/>;
+        if (showAuth) {
+            return <AuthPanel onAuthenticated={setUser} onBack={() => setShowAuth(false)}/>;
+        }
+
+        return <LandingPage onGetStarted={() => setShowAuth(true)}/>;
     }
 
     return <PhoenixWorkspace user={user} onLogout={logout}/>;

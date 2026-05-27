@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Cpu, Hexagon } from 'lucide-react';
+import { ArrowLeft, Cpu, Hexagon } from 'lucide-react';
 
-export default function AuthPanel({ onAuthenticated }) {
+export default function AuthPanel({ onAuthenticated, onBack }) {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({
     name: '',
@@ -66,6 +66,16 @@ export default function AuthPanel({ onAuthenticated }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_78%_16%,rgba(48,98,185,0.24),transparent_34%),radial-gradient(circle_at_12%_85%,rgba(70,54,133,0.20),transparent_32%),linear-gradient(132deg,#0b1421,#101a2b_52%,#0b2230)] p-5">
       <section className="w-full max-w-md rounded-[28px] border border-white/5 bg-[#151f32]/72 p-7 shadow-[0_28px_78px_rgba(0,0,0,0.36)] backdrop-blur-xl md:p-9">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#91a8c8] transition hover:text-[#c9dcf8]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to overview
+          </button>
+        )}
 
         <div className="flex items-center gap-3">
           <div className="relative flex h-11 w-11 items-center justify-center rounded-[14px] bg-[linear-gradient(135deg,#376df2,#65c6ff)] text-white shadow-[0_10px_24px_rgba(55,109,242,0.24)]">
