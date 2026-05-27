@@ -15,11 +15,10 @@ body {
 
 /* Optional: smooth fonts */
 body {
-  @apply bg-[#f7f8fc] text-[#1f2a44];
+  @apply bg-[#061117] text-[#dbe8ed];
   min-height: 100vh;
   font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif;
-  background:
-    linear-gradient(90deg, #fbf8ff 0%, #f7f6ff 34%, #eef7ff 100%);
+  background: #061117;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

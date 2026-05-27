@@ -1,9 +1,9 @@
 import './globals.css';
 export const metadata = {
-    title: 'Synthiolabs',
-    description: 'Chat Streaming',
+    title: 'Phoenix Engine | Physics Intelligence',
+    description: 'Physics-informed engineering analysis for rapid R&D iteration.',
     icons: {
-        icon: '/icon.jpeg',
+        icon: '/icon.svg',
     },
 };
 export default function RootLayout({ children, }) {

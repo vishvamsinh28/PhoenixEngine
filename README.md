@@ -1,65 +1,59 @@
-# SynthioLabs Chat UI
+# Phoenix Engine
 
-This project is a responsive mock chat experience built with Next.js and Tailwind CSS. It focuses on UI polish, reusable components, and a lightweight mock streaming flow for assistant replies.
+Phoenix Engine is a physics-informed engineering copilot for rapid R&D screening. It helps teams frame simulation studies, reason about thermal, aerodynamic, battery, materials, and manufacturing problems, and turn engineering questions into fast preliminary analysis.
 
-Live demo:
-- [synthioassignment.vercel.app](https://synthioassignment.vercel.app/)
+The product is designed for early iteration. Its AI responses are not a replacement for validated CFD, FEA, process simulation, or physical testing.
 
-## Setup
+## Features
 
-Requirements:
-- Node.js 18+
-- npm
+- Engineering Copilot with project-specific analysis threads
+- Seed projects across electronics thermal, aerodynamics, battery cooling, and semiconductor processing
+- Gemini-powered server-side engineering responses
+- MongoDB conversation persistence when configured
+- CAD/data asset selection for STEP, IGES, STL, CSV, JSON, VTK, and OBJ inputs
+- Screening-result streaming UI with assumption and validation messaging
+- Overview, model library, and dataset workspace surfaces
 
-Run locally:
+Asset files are currently represented in prompt context by filename only. Binary CAD parsing and solver ingestion are the next integration stage.
+
+## Configuration
+
+Create an `.env` file locally:
+
+```bash
+GEMINI_API=your_google_ai_api_key
+GEMINI_MODEL=gemini-2.5-flash
+MONGO_DATABASE_URL=mongodb+srv://username:password@cluster/phoenix_engine
+```
+
+- `GEMINI_API` is read only in the server API route and is never sent to the browser.
+- `GEMINI_MODEL` chooses the Gemini model used for analysis generation.
+- `MONGO_DATABASE_URL` enables persisted thread messages through the official MongoDB Node.js driver.
+- Without configuration, the UI remains usable with seeded projects and clearly marked fallback responses.
+
+## Run Locally
+
+Requirements: Node.js 18+ and npm.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Production build:
+Production verification:
 
 ```bash
+npm run lint
 npm run build
 npm run start
 ```
 
-## Libraries Used
+## Architecture
 
-- `next`
-  App framework and routing
-- `react` / `react-dom`
-  UI rendering and state management
-- `tailwindcss`
-  Styling and responsive utility classes
-- `lucide-react`
-  Icons used across the interface
-- `postcss` / `autoprefixer`
-  Tailwind build pipeline
-
-## Project Structure
-
-- [app/page.jsx](/app/page.jsx)
-  Main page layout
-- [hooks/useMockChat.js](/hooks/useMockChat.js)
-  Mock chat state and streaming behavior
-- [data/mockData.js](/data/mockData.js)
-  Seed chat and message data
-- [data/uiConfig.js](/data/uiConfig.js)
-  Shared UI config such as nav tabs and message actions
-- [components](/components)
-  Reusable UI components
-
-## Assumptions
-
-- The chat experience is mock/demo only and does not call a backend or real AI model.
-- Assistant replies are streamed from a random response chosen from the mock assistant message pool.
-- While a reply is streaming, the composer is intentionally disabled to avoid overlapping sends.
-- Sidebar previews are derived from message state so the conversation list stays in sync with the active thread.
-- The current implementation prioritizes clean component structure and responsive behavior over backend integration.
-
-## Notes
-
-- The copy action on assistant messages is functional.
-- Mobile uses a floating chat list sheet opened from the hamburger menu.
+- `app/page.jsx`: Phoenix Engine workspace shell
+- `app/api/chat/route.js`: Gemini-backed engineering response endpoint
+- `app/api/conversations/route.js`: stored or seeded conversation loader
+- `hooks/usePhoenixChat.js`: browser conversation and streamed-display state
+- `data/engineData.js`: starter engineering projects
+- `lib/gemini.js`: server-only Gemini REST integration
+- `lib/mongodb.js`: MongoDB connection reuse and persistence setup

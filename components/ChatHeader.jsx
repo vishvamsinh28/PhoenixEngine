@@ -1,23 +1,26 @@
 'use client';
-import { Video, Phone } from 'lucide-react';
-import { applyAvatarFallback } from '@/lib/chatUtils';
-import IconActionButton from '@/components/IconActionButton';
+import { Activity, ShieldCheck } from 'lucide-react';
 
-export default function ChatHeader({ chat }) {
-    return (<div className="flex flex-shrink-0 items-center justify-between border-b border-[#e8edf6] bg-white px-4 py-4 md:px-6">
+export default function ChatHeader({ project, runtime }) {
+    return (<div className="flex flex-shrink-0 flex-wrap items-center justify-between gap-4 border-b border-[#e6edf2] bg-[#09141c]/95 px-4 py-4 md:px-6">
       <div className="flex items-center gap-3">
-        <div className="relative">
-          <img src={chat.avatar} alt={chat.name} className="h-11 w-11 rounded-full object-cover ring-1 ring-black/5 md:h-12 md:w-12" onError={(event) => applyAvatarFallback(event, chat.name)}/>
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] md:h-12 md:w-12">
+          <Activity className="h-5 w-5" style={{ color: project.color }}/>
         </div>
         <div>
-          <h3 className="text-[15px] font-semibold tracking-[-0.02em] text-[#1e2a45] md:text-[16px]">{chat.name}</h3>
-          <p className="text-[13px] text-[#96a0b5]">{chat.role}</p>
+          <h3 className="text-[15px] font-semibold tracking-[-0.02em] text-white md:text-[16px]">{project.name}</h3>
+          <p className="text-[13px] text-[#91a6b2]">{project.discipline} <span className="mx-1 text-[#4c6470]">/</span> {project.status}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <IconActionButton icon={Video} title="Video call" rounded="full" sizeClass="h-4 w-4" buttonClassName="flex h-10 w-10 items-center justify-center border border-[#e6ebf4] bg-white text-[#4f5d78] shadow-[0_1px_2px_rgba(31,42,68,0.02)] hover:bg-[#f6f8fc]"/>
-        <IconActionButton icon={Phone} title="Audio call" rounded="full" sizeClass="h-4 w-4" buttonClassName="flex h-10 w-10 items-center justify-center border border-[#e6ebf4] bg-white text-[#4f5d78] shadow-[0_1px_2px_rgba(31,42,68,0.02)] hover:bg-[#f6f8fc]"/>
+      <div className="flex items-center gap-3">
+        <div className="rounded-full border border-[#203846] bg-[#101f29] px-3 py-1.5 text-xs font-medium text-[#b3c4cc]">
+          {project.metric}
+        </div>
+        <div className="flex items-center gap-1.5 rounded-full border border-[#164936] bg-[#0d2b22] px-3 py-1.5 text-xs font-medium text-[#70e1ac]">
+          <ShieldCheck className="h-3.5 w-3.5"/>
+          {runtime}
+        </div>
       </div>
     </div>);
 }
