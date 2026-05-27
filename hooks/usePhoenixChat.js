@@ -23,6 +23,9 @@ export function usePhoenixChat() {
     const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const streamIntervalRef = useRef(null);
+    const streamResolveRef = useRef(null);
+    const requestControllerRef = useRef(null);
+    const pendingExchangeRef = useRef(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -52,6 +55,7 @@ export function usePhoenixChat() {
             isMounted = false;
             if (streamIntervalRef.current)
                 window.clearInterval(streamIntervalRef.current);
+            requestControllerRef.current?.abort();
         };
     }, []);
 
@@ -79,6 +83,7 @@ export function usePhoenixChat() {
     const streamAssistantMessage = (projectId, assistantMessageId, answer) => new Promise((resolve) => {
         const chunks = answer.split(/(\s+)/);
         let index = 0;
+        streamResolveRef.current = resolve;
         streamIntervalRef.current = window.setInterval(() => {
             index = Math.min(index + 3, chunks.length);
             setMessages((previous) => updateMessage(previous, projectId, assistantMessageId, {
@@ -87,10 +92,45 @@ export function usePhoenixChat() {
             if (index >= chunks.length) {
                 window.clearInterval(streamIntervalRef.current);
                 streamIntervalRef.current = null;
+                streamResolveRef.current = null;
                 resolve();
             }
         }, STREAM_STEP_MS);
     });
+
+    const stopGeneration = () => {
+        if (!isStreaming || !pendingExchangeRef.current)
+            return;
+
+        const pending = pendingExchangeRef.current;
+        requestControllerRef.current?.abort();
+        requestControllerRef.current = null;
+
+        if (streamIntervalRef.current) {
+            window.clearInterval(streamIntervalRef.current);
+            streamIntervalRef.current = null;
+        }
+        if (streamResolveRef.current) {
+            streamResolveRef.current();
+            streamResolveRef.current = null;
+        }
+
+        if (pending.savedMessage) {
+            setMessages((previous) => updateMessage(previous, pending.projectId, pending.assistantMessageId, {
+                id: pending.savedMessage.id,
+                message: pending.savedMessage.message,
+            }));
+        }
+        else {
+            setMessages((previous) => ({
+                ...previous,
+                [pending.projectId]: (previous[pending.projectId] || []).filter((message) => message.id !== pending.userMessageId && message.id !== pending.assistantMessageId),
+            }));
+        }
+
+        pendingExchangeRef.current = null;
+        setIsStreaming(false);
+    };
 
     const sendMessage = async (text) => {
         if (isStreaming || !activeProject)
@@ -99,10 +139,18 @@ export function usePhoenixChat() {
         const projectId = activeProject.id;
         const userMessage = { id: `user-${Date.now()}`, sender: 'user', message: text };
         const assistantMessageId = `assistant-pending-${Date.now()}`;
+        const controller = new AbortController();
 
         setIsStreaming(true);
         setError('');
         setSearchQuery('');
+        requestControllerRef.current = controller;
+        pendingExchangeRef.current = {
+            projectId,
+            userMessageId: userMessage.id,
+            assistantMessageId,
+            savedMessage: null,
+        };
         setMessages((previous) => ({
             ...previous,
             [projectId]: [...(previous[projectId] || []), userMessage, { id: assistantMessageId, sender: 'assistant', message: '' }],
@@ -113,15 +161,22 @@ export function usePhoenixChat() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ projectId, message: text }),
+                signal: controller.signal,
             });
             const payload = await response.json();
 
             if (!response.ok)
                 throw new Error(payload.error || 'Analysis request failed.');
 
+            if (!pendingExchangeRef.current)
+                return;
+            pendingExchangeRef.current.savedMessage = payload.message;
+            requestControllerRef.current = null;
             await streamAssistantMessage(projectId, assistantMessageId, payload.message.message);
         }
         catch (failure) {
+            if (failure.name === 'AbortError')
+                return;
             setMessages((previous) => ({
                 ...previous,
                 [projectId]: (previous[projectId] || []).filter((message) => message.id !== userMessage.id && message.id !== assistantMessageId),
@@ -129,7 +184,11 @@ export function usePhoenixChat() {
             setError(failure.message || 'Analysis request failed.');
         }
         finally {
-            setIsStreaming(false);
+            if (pendingExchangeRef.current?.assistantMessageId === assistantMessageId) {
+                pendingExchangeRef.current = null;
+                requestControllerRef.current = null;
+                setIsStreaming(false);
+            }
         }
     };
 
@@ -169,6 +228,7 @@ export function usePhoenixChat() {
         projectList,
         searchQuery,
         sendMessage,
+        stopGeneration,
         setSearchQuery,
         setActiveProjectId,
         setSidebarOpen,

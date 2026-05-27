@@ -15,6 +15,13 @@ The product is designed for early iteration. Its AI responses are not a replacem
 - Saved conversation search, Markdown export, and per-domain history deletion
 - Screening-result streaming UI with assumption and validation messaging
 - Functional copy-answer and sign-out actions
+- Stop-generating control with cancellation-aware answer handling
+- Deterministic thermal-resistance screening runs with validated physical inputs
+- Saved thermal run history, temperature-margin status, and convection sensitivity comparison
+- External-flow force and Reynolds screening driven by user-supplied aerodynamic coefficients
+- Battery liquid-loop energy-balance and rectangular-channel pressure-drop screening
+- Reaction-limited thin-film deposition uniformity screening with temperature sensitivity
+- Saved domain run history and one-click handoff of calculated results into chat for interpretation
 
 ## Configuration
 
@@ -28,7 +35,7 @@ MONGO_DATABASE_URL=mongodb+srv://username:password@cluster/phoenix_engine
 
 - `GEMINI_API` is read only in the server API route and is never sent to the browser.
 - `GEMINI_MODEL` chooses the Gemini model used for analysis generation.
-- `MONGO_DATABASE_URL` stores user accounts, expiring sessions, and user-owned messages through the official MongoDB Node.js driver.
+- `MONGO_DATABASE_URL` stores user accounts, expiring sessions, user-owned messages, and saved engineering screening runs through the official MongoDB Node.js driver.
 - MongoDB and Gemini configuration are required for the authenticated analysis workflow.
 
 ## Run Locally
@@ -53,9 +60,15 @@ npm run start
 - `app/page.jsx`: Phoenix Engine workspace shell
 - `app/api/chat/route.js`: Gemini-backed engineering response endpoint
 - `app/api/conversations/route.js`: authenticated saved-conversation loader
+- `app/api/thermal-runs/route.js`: authenticated calculation and persistence endpoint for thermal screening runs
+- `app/api/*-runs/route.js`: authenticated persisted screening runs for aerodynamics, battery cooling, and process modeling
 - `app/api/auth/*`: account and session endpoints
 - `hooks/usePhoenixChat.js`: browser conversation and streamed-display state
 - `data/engineData.js`: available engineering analysis domains
+- `lib/thermalAnalysis.js`: deterministic steady-state thermal resistance calculation and sensitivity sweep
+- `lib/aerodynamicsAnalysis.js`: coefficient-driven external-flow force and Reynolds calculation
+- `lib/batteryCoolingAnalysis.js`: coolant energy balance and rectangular-channel pressure-drop calculation
+- `lib/processModelingAnalysis.js`: reaction-limited Arrhenius deposition uniformity calculation
 - `lib/auth.js`: password hashing and database-backed sessions
 - `lib/gemini.js`: server-only Gemini REST integration
 - `lib/mongodb.js`: MongoDB connection reuse and persistence setup

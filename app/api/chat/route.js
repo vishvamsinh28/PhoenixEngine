@@ -46,6 +46,7 @@ export async function POST(request) {
         const assistantText = await generateEngineeringAnswer({
                 project,
                 messages: [...history, userMessage],
+                signal: request.signal,
         });
         if (!assistantText) {
             return NextResponse.json({ error: 'The analysis engine is not configured.' }, { status: 503 });
@@ -59,6 +60,9 @@ export async function POST(request) {
             userId: user._id,
             createdAt: new Date(),
         };
+        if (request.signal.aborted) {
+            return NextResponse.json({ error: 'Generation stopped.' }, { status: 499 });
+        }
         await database.collection('messages').insertMany([userMessage, assistantMessage]);
 
         return NextResponse.json({
@@ -67,6 +71,9 @@ export async function POST(request) {
         });
     }
     catch (error) {
+        if (error.name === 'AbortError') {
+            return NextResponse.json({ error: 'Generation stopped.' }, { status: 499 });
+        }
         console.error('Phoenix Engine chat request failed:', error);
         return NextResponse.json({ error: 'Unable to complete this engineering run.' }, { status: 500 });
     }

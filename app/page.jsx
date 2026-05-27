@@ -8,6 +8,8 @@ import MessageBubble from '@/components/MessageBubble';
 import ChatInput from '@/components/ChatInput';
 import AuthPanel from '@/components/AuthPanel';
 import ConversationTools from '@/components/ConversationTools';
+import ThermalWorkbench from '@/components/ThermalWorkbench';
+import DomainWorkbench from '@/components/DomainWorkbench';
 import { usePhoenixChat } from '@/hooks/usePhoenixChat';
 
 function PhoenixWorkspace({ user, onLogout }) {
@@ -22,6 +24,7 @@ function PhoenixWorkspace({ user, onLogout }) {
         projectList,
         searchQuery,
         sendMessage,
+        stopGeneration,
         setSearchQuery,
         setActiveProjectId,
         setSidebarOpen,
@@ -52,6 +55,8 @@ function PhoenixWorkspace({ user, onLogout }) {
               disabled={isStreaming || isLoading}
             />
             <div className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))] px-4 py-5 md:px-7 md:py-7">
+              {activeProject.id === 'thermal-inverter' && <ThermalWorkbench disabled={isStreaming || isLoading} onDiscuss={sendMessage}/>}
+              {activeProject.id !== 'thermal-inverter' && <DomainWorkbench key={activeProject.id} projectId={activeProject.id} disabled={isStreaming || isLoading} onDiscuss={sendMessage}/>}
               {isLoading && <p className="py-10 text-center text-sm text-[#91a1bd]">Loading saved conversation...</p>}
               {!isLoading && currentMessages.length === 0 && (<div className="mx-auto mt-16 max-w-lg text-center">
                   <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#e4ebf6]">Start a {activeProject.name.toLowerCase()} analysis</h2>
@@ -62,7 +67,7 @@ function PhoenixWorkspace({ user, onLogout }) {
               <div ref={messagesEndRef}/>
             </div>
             {error && <p className="mx-4 mb-3 rounded-xl bg-[#38202d]/90 px-4 py-3 text-sm text-[#f3a8ba] shadow-sm md:mx-6">{error}</p>}
-            <ChatInput onSend={sendMessage} disabled={isStreaming || isLoading} projectName={activeProject?.name}/>
+            <ChatInput onSend={sendMessage} onStop={stopGeneration} isGenerating={isStreaming} isLoading={isLoading} projectName={activeProject?.name}/>
           </div>
         </main>
       </div>
