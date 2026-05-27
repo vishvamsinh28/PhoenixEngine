@@ -60,7 +60,7 @@ function PhoenixWorkspace({ user, onLogout }) {
               {isLoading && <p className="py-10 text-center text-sm text-[#91a1bd]">Loading saved conversation...</p>}
               {!isLoading && currentMessages.length === 0 && (<div className="mx-auto mt-16 max-w-lg text-center">
                   <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#e4ebf6]">Start a {activeProject.name.toLowerCase()} analysis</h2>
-                  <p className="mt-3 text-sm leading-7 text-[#95a4bf]">Describe geometry, materials, operating conditions, and the output you need. Your questions and generated answers will be stored in this account.</p>
+                  <p className="mt-3 text-sm leading-7 text-[#95a4bf]">Describe geometry, materials, operating conditions, and the output you need.</p>
                 </div>)}
               {!isLoading && currentMessages.length > 0 && visibleMessages.length === 0 && <p className="py-10 text-center text-sm text-[#91a1bd]">No messages match your search.</p>}
               {visibleMessages.map((message) => (<MessageBubble key={message.id} message={message}/>))}
