@@ -35,9 +35,11 @@ function PhoenixWorkspace({ user, onLogout }) {
         visibleMessages,
     } = usePhoenixChat();
     const [activeView, setActiveView] = useState('dashboard');
+    const [showScrollControls, setShowScrollControls] = useState(false);
     const messagesTopRef = useRef(null);
     const messagesEndRef = useRef(null);
     const messagesScrollRef = useRef(null);
+    const scrollControlsTimerRef = useRef(null);
     const toggleSidebar = useCallback(() => setSidebarOpen((previous) => !previous), [setSidebarOpen]);
     const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
     const openWorkbenchProject = useCallback((projectId) => {
@@ -49,6 +51,31 @@ function PhoenixWorkspace({ user, onLogout }) {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [currentMessages]);
+
+    useEffect(() => () => {
+        if (scrollControlsTimerRef.current) {
+            clearTimeout(scrollControlsTimerRef.current);
+        }
+    }, []);
+
+    const revealScrollControls = useCallback(() => {
+        const scrollContainer = messagesScrollRef.current;
+
+        if (!scrollContainer || scrollContainer.scrollHeight <= scrollContainer.clientHeight) {
+            setShowScrollControls(false);
+            return;
+        }
+
+        setShowScrollControls(true);
+
+        if (scrollControlsTimerRef.current) {
+            clearTimeout(scrollControlsTimerRef.current);
+        }
+
+        scrollControlsTimerRef.current = setTimeout(() => {
+            setShowScrollControls(false);
+        }, 900);
+    }, []);
 
     const scrollChatToTop = useCallback(() => {
         messagesScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -91,7 +118,7 @@ function PhoenixWorkspace({ user, onLogout }) {
                 onClear={clearConversation}
                 disabled={isStreaming || isLoading}
               />
-              <div ref={messagesScrollRef} className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))] px-4 py-5 md:px-7 md:py-7">
+              <div ref={messagesScrollRef} onScroll={revealScrollControls} className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))] px-4 py-5 md:px-7 md:py-7">
                 <div ref={messagesTopRef}/>
                 {activeProject.id === 'thermal-inverter' && <ThermalWorkbench disabled={isStreaming || isLoading} onDiscuss={sendMessage}/>}
                 {activeProject.id !== 'thermal-inverter' && <DomainWorkbench key={activeProject.id} projectId={activeProject.id} disabled={isStreaming || isLoading} onDiscuss={sendMessage}/>}
@@ -104,12 +131,13 @@ function PhoenixWorkspace({ user, onLogout }) {
                 {visibleMessages.map((message) => (<MessageBubble key={message.id} message={message}/>))}
                 <div ref={messagesEndRef}/>
               </div>
-              <div className="pointer-events-none absolute bottom-24 right-4 z-20 flex flex-col gap-2 md:right-6">
+              <div className={`pointer-events-none absolute bottom-24 right-4 z-20 flex flex-col gap-2 transition duration-200 md:right-6 ${showScrollControls ? 'opacity-100' : 'opacity-0'}`}>
                 <button
                   type="button"
                   onClick={scrollChatToTop}
                   title="Go to top"
-                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-xl border border-[#2f4563] bg-[#142238]/92 text-[#c7d5e8] shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-[#1d3048]"
+                  tabIndex={showScrollControls ? 0 : -1}
+                  className={`${showScrollControls ? 'pointer-events-auto' : 'pointer-events-none'} flex h-10 w-10 items-center justify-center rounded-xl border border-[#2f4563] bg-[#142238]/92 text-[#c7d5e8] shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-[#1d3048]`}
                 >
                   <ArrowUp className="h-4 w-4"/>
                 </button>
@@ -117,7 +145,8 @@ function PhoenixWorkspace({ user, onLogout }) {
                   type="button"
                   onClick={scrollChatToBottom}
                   title="Go to bottom"
-                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-xl border border-[#2f4563] bg-[#142238]/92 text-[#c7d5e8] shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-[#1d3048]"
+                  tabIndex={showScrollControls ? 0 : -1}
+                  className={`${showScrollControls ? 'pointer-events-auto' : 'pointer-events-none'} flex h-10 w-10 items-center justify-center rounded-xl border border-[#2f4563] bg-[#142238]/92 text-[#c7d5e8] shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-[#1d3048]`}
                 >
                   <ArrowDown className="h-4 w-4"/>
                 </button>
