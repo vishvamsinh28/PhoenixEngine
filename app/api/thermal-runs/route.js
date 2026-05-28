@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
 import { getPhoenixDatabase } from '@/lib/mongodb';
 import { calculateThermalScreening, THERMAL_PROJECT_ID } from '@/lib/thermalAnalysis';
+import { isRequestValidationError, readJsonBody } from '@/lib/requestValidation';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +57,7 @@ export async function POST(request) {
         if (authorized.error)
             return authorized.error;
 
-        const body = await request.json();
+        const body = await readJsonBody(request, { maxBytes: 16 * 1024 });
         const result = calculateThermalScreening(body);
         const run = {
             id: `thermal-${randomUUID()}`,
@@ -70,6 +71,8 @@ export async function POST(request) {
         return NextResponse.json({ run: cleanRun(run) }, { status: 201 });
     }
     catch (error) {
+        if (isRequestValidationError(error))
+            return NextResponse.json({ error: error.message }, { status: error.status });
         if (error.message?.includes('must be between'))
             return NextResponse.json({ error: error.message }, { status: 400 });
 
@@ -84,7 +87,7 @@ export async function DELETE(request) {
         if (authorized.error)
             return authorized.error;
 
-        const body = await request.json();
+        const body = await readJsonBody(request, { maxBytes: 2048 });
         if (typeof body.runId !== 'string' || !body.runId.startsWith('thermal-'))
             return NextResponse.json({ error: 'A valid saved thermal run is required.' }, { status: 400 });
 
@@ -96,6 +99,8 @@ export async function DELETE(request) {
         return NextResponse.json({ deleted: true });
     }
     catch (error) {
+        if (isRequestValidationError(error))
+            return NextResponse.json({ error: error.message }, { status: error.status });
         console.error('Unable to delete thermal screening run:', error);
         return NextResponse.json({ error: 'Unable to delete this thermal run.' }, { status: 500 });
     }

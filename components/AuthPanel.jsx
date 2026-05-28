@@ -62,7 +62,7 @@ export default function AuthPanel({ onAuthenticated, onBack }) {
   };
 
   const inputStyles =
-    'mt-2 block w-full rounded-xl border border-[#2b3b55] bg-[#1a2436] px-4 py-3 text-[#e0e8f5] placeholder:text-[#6f819d] shadow-[inset_0_1px_3px_rgba(0,0,0,0.18)] outline-none transition duration-200 focus:border-[#4e7eeb] focus:bg-[#223249] focus:ring-4 focus:ring-[#4e7eeb]/20';
+    'auth-input mt-2 block w-full rounded-xl border border-[#2b3b55] bg-[#1a2436] px-4 py-3 text-[#e0e8f5] caret-[#e0e8f5] placeholder:text-[#6f819d] shadow-[inset_0_1px_3px_rgba(0,0,0,0.18)] outline-none transition duration-200 [color-scheme:dark] focus:border-[#4e7eeb] focus:bg-[#223249] focus:ring-4 focus:ring-[#4e7eeb]/20';
   const passwordInputStyles =
     `${inputStyles} pr-12`;
 
@@ -119,6 +119,7 @@ export default function AuthPanel({ onAuthenticated, onBack }) {
                 required
                 minLength={2}
                 name="name"
+                autoComplete="name"
                 value={form.name}
                 onChange={updateField}
                 placeholder="Enter your name"
@@ -134,6 +135,7 @@ export default function AuthPanel({ onAuthenticated, onBack }) {
               required
               type="email"
               name="email"
+              autoComplete="email"
               value={form.email}
               onChange={updateField}
               placeholder="Enter your email"
@@ -150,6 +152,7 @@ export default function AuthPanel({ onAuthenticated, onBack }) {
                 minLength={8}
                 type={showPassword ? 'text' : 'password'}
                 name="password"
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 value={form.password}
                 onChange={updateField}
                 placeholder="Enter your password"

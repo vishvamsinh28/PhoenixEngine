@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { projectById, projects, emptyMessagesByProject } from '@/data/engineData';
 import { getSessionUser } from '@/lib/auth';
 import { getPhoenixDatabase } from '@/lib/mongodb';
+import { isRequestValidationError, readJsonBody } from '@/lib/requestValidation';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +45,7 @@ export async function DELETE(request) {
             return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
         }
 
-        const body = await request.json();
+        const body = await readJsonBody(request, { maxBytes: 2048 });
         const project = projectById(body.projectId);
         if (!project) {
             return NextResponse.json({ error: 'A valid analysis domain is required.' }, { status: 400 });
@@ -58,6 +59,9 @@ export async function DELETE(request) {
         return NextResponse.json({ deletedCount: result.deletedCount });
     }
     catch (error) {
+        if (isRequestValidationError(error)) {
+            return NextResponse.json({ error: error.message }, { status: error.status });
+        }
         console.error('Unable to clear Phoenix Engine conversation:', error);
         return NextResponse.json({ error: 'Unable to clear conversation history.' }, { status: 500 });
     }

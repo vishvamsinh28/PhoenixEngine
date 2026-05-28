@@ -1,15 +1,7 @@
 'use client';
 
 import { Download, GitCompareArrows, Info, LineChart, MessageSquare, ShieldCheck } from 'lucide-react';
-
-function formatDate(value) {
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(value));
-}
+import { formatDate } from '@/lib/dateFormat';
 
 function escapeHtml(value) {
   return String(value)

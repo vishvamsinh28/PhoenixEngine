@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createSession, hashPassword, isValidEmail, normalizeEmail, serializeAuthenticatedUser, setSessionCookie } from '@/lib/auth';
 import { getPhoenixDatabase } from '@/lib/mongodb';
+import { isRequestValidationError, readJsonBody } from '@/lib/requestValidation';
 
 export async function POST(request) {
     const database = await getPhoenixDatabase();
@@ -8,12 +9,12 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Authentication requires MongoDB configuration.' }, { status: 503 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request, { maxBytes: 4096 });
     const name = String(body.name || '').trim();
     const email = normalizeEmail(body.email);
     const password = String(body.password || '');
 
-    if (name.length < 2 || !isValidEmail(email) || password.length < 8) {
+    if (name.length < 2 || name.length > 80 || email.length > 254 || !isValidEmail(email) || password.length < 8 || password.length > 256) {
         return NextResponse.json({ error: 'Enter a name, valid email, and password of at least 8 characters.' }, { status: 400 });
     }
 
@@ -32,6 +33,9 @@ export async function POST(request) {
         return response;
     }
     catch (error) {
+        if (isRequestValidationError(error)) {
+            return NextResponse.json({ error: error.message }, { status: error.status });
+        }
         if (error.code === 11000) {
             return NextResponse.json({ error: 'An account with this email already exists.' }, { status: 409 });
         }

@@ -3,6 +3,7 @@ import { projectById } from '@/data/engineData';
 import { getSessionUser } from '@/lib/auth';
 import { generateEngineeringAnswer } from '@/lib/gemini';
 import { getPhoenixDatabase } from '@/lib/mongodb';
+import { isRequestValidationError, readJsonBody } from '@/lib/requestValidation';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,12 +19,15 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
         }
 
-        const body = await request.json();
+        const body = await readJsonBody(request, { maxBytes: 16 * 1024 });
         const project = projectById(body.projectId);
         const message = typeof body.message === 'string' ? body.message.trim() : '';
 
         if (!project || !message) {
             return NextResponse.json({ error: 'A valid project and engineering question are required.' }, { status: 400 });
+        }
+        if (message.length > 4000) {
+            return NextResponse.json({ error: 'Message is too long. Keep engineering questions under 4000 characters.' }, { status: 413 });
         }
 
         const storedHistory = await database.collection('messages')
@@ -71,6 +75,9 @@ export async function POST(request) {
         });
     }
     catch (error) {
+        if (isRequestValidationError(error)) {
+            return NextResponse.json({ error: error.message }, { status: error.status });
+        }
         if (error.name === 'AbortError') {
             return NextResponse.json({ error: 'Generation stopped.' }, { status: 499 });
         }
