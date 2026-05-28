@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "katex": "^0.17.0",
     "lucide-react": "^0.446.0",
     "mongodb": "^6.21.0",
