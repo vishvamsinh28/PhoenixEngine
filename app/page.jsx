@@ -14,6 +14,7 @@ import ProjectDashboard from '@/components/ProjectDashboard';
 import ThermalWorkbench from '@/components/ThermalWorkbench';
 import DomainWorkbench from '@/components/DomainWorkbench';
 import TutorialPage from '@/components/TutorialPage';
+import SimulationStudio from '@/components/SimulationStudio';
 import { usePhoenixChat } from '@/hooks/usePhoenixChat';
 
 function PhoenixWorkspace({ user, onLogout }) {
@@ -43,11 +44,19 @@ function PhoenixWorkspace({ user, onLogout }) {
     const scrollControlsTimerRef = useRef(null);
     const toggleSidebar = useCallback(() => setSidebarOpen((previous) => !previous), [setSidebarOpen]);
     const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
+    const selectProject = useCallback((projectId) => {
+        setActiveProjectId(projectId);
+        closeSidebar();
+    }, [closeSidebar, setActiveProjectId]);
     const openWorkbenchProject = useCallback((projectId) => {
         setActiveProjectId(projectId);
         setActiveView('workbench');
         closeSidebar();
     }, [closeSidebar, setActiveProjectId]);
+    const discussRunInChat = useCallback((prompt) => {
+        setActiveView('chat');
+        sendMessage(prompt);
+    }, [sendMessage]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -86,17 +95,17 @@ function PhoenixWorkspace({ user, onLogout }) {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
-    return (<div className="flex h-screen flex-col overflow-hidden bg-[radial-gradient(circle_at_84%_10%,rgba(43,96,179,0.22),transparent_34%),linear-gradient(130deg,#0b1421_0%,#111a2b_45%,#0b2230_100%)]">
+    return (<div className="flex h-[100dvh] flex-col overflow-hidden bg-[radial-gradient(circle_at_84%_10%,rgba(43,96,179,0.22),transparent_34%),linear-gradient(130deg,#0b1421_0%,#111a2b_45%,#0b2230_100%)]">
       <TopNav
         activeView={activeView}
-        canShowMenu={activeView === 'workbench'}
+        canShowMenu={activeView === 'workbench' || activeView === 'chat'}
         user={user}
         onMenuToggle={toggleSidebar}
         onLogout={onLogout}
         onViewChange={setActiveView}
       />
-      <div className="flex flex-1 gap-4 overflow-hidden px-0 pb-0 pt-[4.75rem] md:px-4 md:pb-4 md:pt-[5.5rem]">
-        {activeView === 'workbench' && <Sidebar projects={projectList} activeProjectId={activeProjectId} onSelectProject={openWorkbenchProject} isOpen={sidebarOpen} onClose={closeSidebar}/>}
+      <div className="flex flex-1 gap-4 overflow-hidden px-0 pb-0 pt-[7.75rem] md:px-4 md:pb-4 md:pt-[5.5rem]">
+        {(activeView === 'workbench' || activeView === 'chat') && <Sidebar projects={projectList} activeProjectId={activeProjectId} onSelectProject={selectProject} isOpen={sidebarOpen} onClose={closeSidebar}/>}
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden md:rounded-[28px] md:bg-[#141f32]/72 md:shadow-[0_24px_64px_rgba(1,5,13,0.34)]">
           <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[#121c2e]/54 backdrop-blur-xl md:rounded-[28px]">
             {activeView === 'dashboard' && (
@@ -110,11 +119,35 @@ function PhoenixWorkspace({ user, onLogout }) {
               </div>
             )}
             {activeView === 'tutorial' && (
-              <div className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))]">
-                <TutorialPage onOpenWorkbench={() => setActiveView('workbench')} />
+              <div className="no-scrollbar flex-1 overflow-y-auto bg-[#111b2c]">
+                <TutorialPage onOpenWorkbench={() => setActiveView('workbench')} onOpenSimulations={() => setActiveView('simulations')} />
               </div>
             )}
+            {activeView === 'simulations' && <SimulationStudio disabled={isStreaming || isLoading} onDiscuss={discussRunInChat}/>}
             {activeView === 'workbench' && (<>
+              <ChatHeader project={activeProject}/>
+              <div className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))] px-4 py-5 md:px-7 md:py-7">
+                <div className="mb-5 flex flex-wrap items-start justify-between gap-4 rounded-[22px] border border-[#273c58]/80 bg-[#121e31]/82 p-5 shadow-[0_12px_32px_rgba(0,0,0,0.14)]">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#789ee8]">Workbench</p>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#eaf0fa]">Run deterministic screening</h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#98a9c1]">
+                      Calculate, compare, and save engineering runs here. Use Discuss in Chat when you want Phoenix to interpret a result.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveView('chat')}
+                    className="rounded-lg border border-[#365277] bg-[#1b2d45]/86 px-4 py-2 text-sm font-medium text-[#dce8f7] transition hover:bg-[#243a58]"
+                  >
+                    Open chat
+                  </button>
+                </div>
+                {activeProject.id === 'thermal-inverter' && <ThermalWorkbench disabled={isStreaming || isLoading} onDiscuss={discussRunInChat}/>}
+                {activeProject.id !== 'thermal-inverter' && <DomainWorkbench key={activeProject.id} projectId={activeProject.id} disabled={isStreaming || isLoading} onDiscuss={discussRunInChat}/>}
+              </div>
+            </>)}
+            {activeView === 'chat' && (<>
               <ChatHeader project={activeProject}/>
               <ConversationTools
                 project={activeProject}
@@ -124,10 +157,8 @@ function PhoenixWorkspace({ user, onLogout }) {
                 onClear={clearConversation}
                 disabled={isStreaming || isLoading}
               />
-              <div ref={messagesScrollRef} onScroll={revealScrollControls} className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))] px-4 py-5 md:px-7 md:py-7">
+              <div ref={messagesScrollRef} onScroll={revealScrollControls} className="no-scrollbar flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(16,27,44,0.16),rgba(11,21,35,0.34))] px-4 py-4 pb-6 md:px-7 md:py-7">
                 <div ref={messagesTopRef}/>
-                {activeProject.id === 'thermal-inverter' && <ThermalWorkbench disabled={isStreaming || isLoading} onDiscuss={sendMessage}/>}
-                {activeProject.id !== 'thermal-inverter' && <DomainWorkbench key={activeProject.id} projectId={activeProject.id} disabled={isStreaming || isLoading} onDiscuss={sendMessage}/>}
                 {isLoading && <p className="py-10 text-center text-sm text-[#91a1bd]">Loading saved conversation...</p>}
                 {!isLoading && currentMessages.length === 0 && (<div className="mx-auto mt-16 max-w-lg text-center">
                     <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#e4ebf6]">Start a {activeProject.name.toLowerCase()} analysis</h2>

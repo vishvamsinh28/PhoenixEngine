@@ -7,6 +7,10 @@
   box-sizing: border-box;
 }
 
+html {
+  text-size-adjust: 100%;
+}
+
 html,
 body {
   padding: 0;
@@ -14,6 +18,21 @@ body {
   min-height: 100%;
   background-color: #0b1421;
   overscroll-behavior-y: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+button,
+label,
+input,
+select {
+  overflow-wrap: anywhere;
 }
 
 /* Optional: smooth fonts */
@@ -39,6 +58,12 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }

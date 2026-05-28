@@ -1,16 +1,18 @@
 'use client';
-import { BarChart3, BookOpen, Cpu, Hexagon, LayoutDashboard, Menu } from 'lucide-react';
+import { BarChart3, BookOpen, Box, Cpu, Hexagon, LayoutDashboard, Menu, MessageSquareText } from 'lucide-react';
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
-  { id: 'tutorial', label: 'Tutorial', Icon: BookOpen },
   { id: 'workbench', label: 'Workbench', Icon: BarChart3 },
+  { id: 'simulations', label: 'Simulations', Icon: Box },
+  { id: 'chat', label: 'Chat', Icon: MessageSquareText },
+  { id: 'tutorial', label: 'Tutorial', Icon: BookOpen },
 ];
 
 export default function TopNav({ activeView, canShowMenu, user, onMenuToggle, onLogout, onViewChange }) {
   return (<header className="fixed left-0 right-0 top-0 z-50 bg-[#0c1625]/66 shadow-[0_5px_20px_rgba(1,5,14,0.15)] backdrop-blur-2xl">
-    <div className="px-4 md:px-6">
-      <div className="relative flex h-[72px] items-center justify-between gap-3 md:h-[76px]">
+    <div className="px-3 py-3 md:px-6 md:py-0">
+      <div className="relative flex flex-wrap items-center justify-between gap-3 md:h-[76px] md:flex-nowrap">
         <div className="flex min-w-0 items-center gap-3">
           {canShowMenu && (
             <button onClick={onMenuToggle} className="shrink-0 rounded-xl p-2 transition-colors hover:bg-[#1a2639] md:hidden">
@@ -34,36 +36,23 @@ export default function TopNav({ activeView, canShowMenu, user, onMenuToggle, on
           </div>
         </div>
 
-        <nav className="hidden rounded-2xl border border-[#263a55] bg-[#111d2e]/78 p-1 md:flex">
+        <nav className="order-3 flex w-full gap-1 overflow-x-auto rounded-2xl border border-[#263a55] bg-[#111d2e]/78 p-1 md:order-none md:w-auto md:overflow-visible">
           {navItems.map(({ id, label, Icon }) => (
             <button
               key={id}
               type="button"
               onClick={() => onViewChange(id)}
-              className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition ${activeView === id ? 'bg-[#244064] text-[#edf3fb] shadow-[0_8px_18px_rgba(0,0,0,0.16)]' : 'text-[#91a3bd] hover:bg-[#1a2a40] hover:text-[#dce7f5]'}`}
+              className={`flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-medium transition md:flex-none md:px-3.5 md:text-sm ${activeView === id ? 'bg-[#244064] text-[#edf3fb] shadow-[0_8px_18px_rgba(0,0,0,0.16)]' : 'text-[#91a3bd] hover:bg-[#1a2a40] hover:text-[#dce7f5]'}`}
             >
               <Icon className="h-4 w-4" />
-              {label}
+              <span className="hidden min-[430px]:inline md:inline">{label}</span>
             </button>
           ))}
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex rounded-xl border border-[#263a55] bg-[#111d2e]/78 p-1 md:hidden">
-            {navItems.map(({ id, label, Icon }) => (
-              <button
-                key={id}
-                type="button"
-                title={label}
-                onClick={() => onViewChange(id)}
-                className={`rounded-lg p-2 transition ${activeView === id ? 'bg-[#244064] text-[#edf3fb]' : 'text-[#91a3bd] hover:bg-[#1a2a40] hover:text-[#dce7f5]'}`}
-              >
-                <Icon className="h-4 w-4" />
-              </button>
-            ))}
-          </div>
           <p className="hidden text-sm font-medium text-[#a4b2ca] sm:block">{user.name}</p>
-          <button onClick={onLogout} className="rounded-xl bg-[#172437]/78 px-3.5 py-2 text-sm font-medium text-[#cad5e7] shadow-[0_5px_14px_rgba(0,0,0,0.14)] transition hover:bg-[#1d2c42]">
+          <button onClick={onLogout} className="rounded-xl bg-[#172437]/78 px-3 py-2 text-xs font-medium text-[#cad5e7] shadow-[0_5px_14px_rgba(0,0,0,0.14)] transition hover:bg-[#1d2c42] sm:text-sm md:px-3.5">
             Sign out
           </button>
         </div>
